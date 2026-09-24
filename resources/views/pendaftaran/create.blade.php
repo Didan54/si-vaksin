@@ -92,9 +92,9 @@
                 <small class="text-muted d-block mt-2">*Biarkan kosong jika belum pernah vaksinasi internasional atau tidak membawa kartu.</small>
             </div>
 
-            <!-- 4. PILIH LAYANAN VAKSINASI (TEPAT SEBELUM SKRINING) -->
+            <!-- 4. PILIH LAYANAN VAKSINASI (BISA PILIH LEBIH DARI 1) -->
             <h5 class="section-title">4. Pilih Layanan Vaksinasi</h5>
-            <p class="text-muted small mb-3">Pilih jenis vaksinasi internasional yang ingin Anda ajukan permohonannya:</p>
+            <p class="text-muted small mb-3">Pilih satu atau beberapa jenis vaksinasi internasional yang ingin diajukan (bisa dicentang lebih dari satu):</p>
 
             <div class="row g-3 mb-4">
                 @foreach($daftarVaksin as $vaksin)
@@ -102,13 +102,13 @@
                         <div class="card card-vaksin-item h-100 {{ !$vaksin->is_aktif ? 'vaksin-disabled' : '' }}">
                             <label class="card-body d-flex align-items-center justify-content-between p-3 mb-0 {{ $vaksin->is_aktif ? 'cursor-pointer' : 'cursor-not-allowed' }}">
                                 <div class="d-flex align-items-center gap-3">
-                                    <input type="radio" 
-                                           name="vaksin_id" 
+                                    <!-- Input diubah menjadi CHECKBOX dengan array nama: vaksin_id[] -->
+                                    <input type="checkbox" 
+                                           name="vaksin_id[]" 
                                            value="{{ $vaksin->id }}" 
                                            class="form-check-input mt-0" 
                                            {{ !$vaksin->is_aktif ? 'disabled' : '' }} 
-                                           {{ (old('vaksin_id') == $vaksin->id) ? 'checked' : '' }} 
-                                           required>
+                                           {{ (is_array(old('vaksin_id')) && in_array($vaksin->id, old('vaksin_id'))) ? 'checked' : '' }}>
                                     
                                     <span class="fw-bold fs-6 {{ $vaksin->is_aktif ? 'text-dark' : 'text-muted' }}">
                                         {{ $vaksin->nama_vaksin }}

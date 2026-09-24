@@ -3,28 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
-use App\Models\Vaksin; // 1. DITAMBAHKAN: Untuk memanggil data vaksin
+use App\Models\Vaksin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule; // 2. DITAMBAHKAN: Untuk validasi status aktif vaksin
+use Illuminate\Validation\Rule;
 
 class PendaftaranController extends Controller
 {
     public function create()
     {
-        // 3. DIUBAH: Mengambil semua jenis vaksin untuk ditampilkan di form
         $daftarVaksin = Vaksin::all();
-
         return view('pendaftaran.create', compact('daftarVaksin'));
     }
 
     public function store(Request $request)
     {
-        // 4. DIUBAH: Menambahkan aturan validasi untuk pilihan vaksin
         $validated = $request->validate([
-            'vaksin_id' => [
+            // Validasi: Wajib memilih minimal 1 checkbox, dan tiap pilihan harus aktif di database
+            'vaksin_id'   => 'required|array|min:1',
+            'vaksin_id.*' => [
                 'required',
-                // Memastikan vaksin yang dipilih ada di tabel dan sedang diaktifkan admin
                 Rule::exists('vaksins', 'id')->where(function ($query) {
                     $query->where('is_aktif', true);
                 }),
@@ -38,14 +36,14 @@ class PendaftaranController extends Controller
             'file_sinkarkes_form'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_paspor'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_ktp'              => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
+            'kartu_vaksin'          => 'nullable|array',
             'skrining'              => 'required|array',
         ], [
-            // Pesan resmi jika seseorang mencoba memilih vaksin yang sedang dinonaktifkan
-            'vaksin_id.required' => 'Silakan pilih salah satu layanan vaksinasi.',
-            'vaksin_id.exists'   => 'Layanan vaksin yang dipilih sedang ditutup sementara (menunggu alokasi distribusi).',
+            'vaksin_id.required' => 'Silakan pilih minimal satu jenis vaksinasi yang ingin diajukan.',
+            'vaksin_id.*.exists' => 'Salah satu jenis vaksin yang dipilih sedang ditutup sementara.',
         ]);
 
-        // Simpan 4 berkas ke storage/app/public/lampiran_berkas
+        // Upload berkas
         $berkas = [];
         foreach (['file_sinkarkes_terima', 'file_sinkarkes_form', 'file_paspor', 'file_ktp'] as $fileKey) {
             if ($request->hasFile($fileKey)) {
@@ -53,13 +51,11 @@ class PendaftaranController extends Controller
             }
         }
 
-        // Generate Nomor Registrasi Unik (Contoh: REG-20260924-XXXX)
         $noRegistrasi = 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
-        // Simpan Data Pendaftaran
+        // 1. Simpan Data Pendaftaran Utama
         $pendaftaran = Pendaftaran::create([
             'nomor_registrasi'      => $noRegistrasi,
-            'vaksin_id'             => $validated['vaksin_id'], // 5. DITAMBAHKAN: Menyimpan ID vaksin pilihan
             'nama_paspor'           => $validated['nama_paspor'],
             'nama_tambahan'         => $validated['nama_tambahan'],
             'tempat_lahir'          => $validated['tempat_lahir'],
@@ -69,9 +65,13 @@ class PendaftaranController extends Controller
             'file_sinkarkes_form'   => $berkas['file_sinkarkes_form'],
             'file_paspor'           => $berkas['file_paspor'],
             'file_ktp'              => $berkas['file_ktp'],
+            'kartu_vaksin'          => $request->input('kartu_vaksin', []),
             'data_skrining'         => $validated['skrining'],
             'status_pendaftaran'    => 'Menunggu Verifikasi',
         ]);
+
+        // 2. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
+        $pendaftaran->vaksins()->attach($validated['vaksin_id']);
 
         return redirect()->route('pendaftaran.sukses', $pendaftaran->id)
                          ->with('success', 'Pendaftaran berhasil dikirim.');
@@ -79,7 +79,7 @@ class PendaftaranController extends Controller
 
     public function sukses($id)
     {
-        $pendaftaran = Pendaftaran::findOrFail($id);
+        $pendaftaran = Pendaftaran::with('vaksins')->findOrFail($id);
         return view('pendaftaran.sukses', compact('pendaftaran'));
     }
 }

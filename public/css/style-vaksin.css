@@ -246,7 +246,8 @@ footer a:hover {
 }
 
 /* Sorotan saat radio dipilih */
-.card-vaksin-item:has(input[type="radio"]:checked) {
+.card-vaksin-item:has(input[type="radio"]:checked),
+.card-vaksin-item:has(input[type="checkbox"]:checked) {
     border-color: var(--bkk-toska) !important;
     background-color: #F0FAF9 !important;
     box-shadow: 0 0 0 1px var(--bkk-toska);

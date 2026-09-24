@@ -34,4 +34,9 @@ class Pendaftaran extends Model
     {
         return $this->hasOne(PemeriksaanKesehatan::class);
     }
+
+    public function vaksins()
+    {
+        return $this->belongsToMany(\App\Models\Vaksin::class, 'pendaftaran_vaksin');
+    }
 }
