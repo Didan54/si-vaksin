@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\PendaftaranPdfController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,5 +16,5 @@ Route::get('/', [PendaftaranController::class, 'create'])->name('pendaftaran.cre
 // Memproses simpan form & unggahan berkas
 Route::post('/daftar', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
 
-// Halaman bukti sukses pendaftaran
-Route::get('/daftar/sukses/{id}', [PendaftaranController::class, 'sukses'])->name('pendaftaran.sukses');
+// Rute Cetak PDF untuk Admin
+Route::get('/admin/pendaftaran/{id}/pdf', [PendaftaranPdfController::class, 'cetak'])->name('admin.pendaftaran.pdf');

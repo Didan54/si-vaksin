@@ -6,11 +6,13 @@ use App\Filament\Resources\PendaftaranResource\Pages;
 use App\Models\Pendaftaran;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\SelectFilter;
 
 class PendaftaranResource extends Resource
 {
@@ -24,7 +26,7 @@ class PendaftaranResource extends Resource
     {
         return $form
             ->schema([
-                // Form detail pemohon bawaan
+                // Form detail pemohon
             ]);
     }
 
@@ -63,7 +65,21 @@ class PendaftaranResource extends Resource
                     ->label('Nama Tambahan')
                     ->searchable(),
 
-                // 5. Jenis Kelamin
+                // 5. NIK
+                TextColumn::make('nik')
+                    ->label('NIK')
+                    ->searchable()
+                    ->copyable()
+                    ->color('gray'),
+
+                // 6. No. Paspor
+                TextColumn::make('no_paspor')
+                    ->label('No. Paspor')
+                    ->searchable()
+                    ->copyable()
+                    ->weight('bold'),
+
+                // 7. Jenis Kelamin
                 TextColumn::make('jenis_kelamin')
                     ->label('L/P')
                     ->badge()
@@ -73,14 +89,14 @@ class PendaftaranResource extends Resource
                         default => 'gray',
                     }),
 
-                // 6. Jenis Vaksin (Multiple Badge dari relasi Many-to-Many)
+                // 8. Jenis Vaksin (Multiple Badge dari relasi pivot)
                 TextColumn::make('vaksins.nama_vaksin')
                     ->label('Jenis Vaksinasi')
                     ->badge()
                     ->color('success')
                     ->separator(','),
 
-                // Status Pendaftaran
+                // 9. Status Pendaftaran
                 TextColumn::make('status_pendaftaran')
                     ->label('Status')
                     ->badge()
@@ -92,18 +108,67 @@ class PendaftaranResource extends Resource
                     }),
             ])
             ->filters([
-                //
+                // Filter dropdown untuk mempermudah petugas mencari berkas yang belum dicek
+                SelectFilter::make('status_pendaftaran')
+                    ->label('Filter Status')
+                    ->options([
+                        'Menunggu Verifikasi' => 'Menunggu Verifikasi',
+                        'Disetujui' => 'Disetujui',
+                        'Ditolak' => 'Ditolak',
+                    ]),
             ])
             ->actions([
-                // Tombol Aksi: Pratinjau Dokumen PDF
-                Action::make('cetak_pdf')
-                    ->label('Lihat Dokumen PDF')
-                    ->icon('heroicon-o-document-arrow-down')
+                // 1. Aksi Verifikasi Kedatangan Pemohon di Klinik
+                Action::make('verifikasi')
+                    ->label('Verifikasi')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (Pendaftaran $record): bool => $record->status_pendaftaran === 'Menunggu Verifikasi')
+                    ->requiresConfirmation()
+                    ->modalHeading('Verifikasi Berkas Pemohon')
+                    ->modalDescription('Apakah pemohon sudah berada di klinik dan seluruh berkas fisik (Paspor asli & KTP) telah diperiksa serta dinyatakan valid?')
+                    ->modalSubmitActionLabel('Ya, Sahkan & Verifikasi')
+                    ->action(function (Pendaftaran $record) {
+                        $record->update([
+                            'status_pendaftaran' => 'Disetujui',
+                        ]);
+
+                        Notification::make()
+                            ->title('Status Berhasil Diverifikasi')
+                            ->body("Data pemohon {$record->nama_paspor} telah disetujui.")
+                            ->success()
+                            ->send();
+                    }),
+
+                // 2. Aksi Tolak (Jika berkas tidak sesuai saat dicek fisik)
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
                     ->color('danger')
+                    ->visible(fn (Pendaftaran $record): bool => $record->status_pendaftaran === 'Menunggu Verifikasi')
+                    ->requiresConfirmation()
+                    ->modalHeading('Tolak Pendaftaran')
+                    ->modalDescription('Apakah berkas atau persyaratan fisik pemohon tidak sesuai kriteria?')
+                    ->modalSubmitActionLabel('Tolak Berkas')
+                    ->action(function (Pendaftaran $record) {
+                        $record->update([
+                            'status_pendaftaran' => 'Ditolak',
+                        ]);
+
+                        Notification::make()
+                            ->title('Pendaftaran Ditolak')
+                            ->danger()
+                            ->send();
+                    }),
+
+                // 3. Tombol Pratinjau Dokumen PDF
+                Action::make('cetak_pdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('gray')
                     ->url(fn (Pendaftaran $record): string => url("/admin/pendaftaran/{$record->id}/pdf"))
                     ->openUrlInNewTab(),
 
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

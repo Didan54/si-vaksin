@@ -29,6 +29,8 @@ class PendaftaranController extends Controller
             ],
             'nama_paspor'           => 'required|string|max:150',
             'nama_tambahan'         => 'required|string|max:150',
+            'nik'                   => 'required|numeric|digits:16',
+            'no_paspor'             => 'required|string|max:25',
             'tempat_lahir'          => 'required|string|max:100',
             'tanggal_lahir'         => 'required|date',
             'jenis_kelamin'         => 'required|in:L,P',
@@ -41,6 +43,10 @@ class PendaftaranController extends Controller
         ], [
             'vaksin_id.required' => 'Silakan pilih minimal satu jenis vaksinasi yang ingin diajukan.',
             'vaksin_id.*.exists' => 'Salah satu jenis vaksin yang dipilih sedang ditutup sementara.',
+            'nik.required'       => 'Nomor Induk Kependudukan (NIK) wajib diisi.',
+            'nik.digits'         => 'NIK harus berjumlah tepat 16 digit angka.',
+            'nik.numeric'        => 'NIK hanya boleh berupa angka.',
+            'no_paspor.required' => 'Nomor paspor wajib diisi.',
         ]);
 
         // Upload berkas
@@ -58,6 +64,8 @@ class PendaftaranController extends Controller
             'nomor_registrasi'      => $noRegistrasi,
             'nama_paspor'           => $validated['nama_paspor'],
             'nama_tambahan'         => $validated['nama_tambahan'],
+            'nik'                   => $validated['nik'],          // <- SUDAH DITAMBAHKAN
+            'no_paspor'             => $validated['no_paspor'],    // <- SUDAH DITAMBAHKAN
             'tempat_lahir'          => $validated['tempat_lahir'],
             'tanggal_lahir'         => $validated['tanggal_lahir'],
             'jenis_kelamin'         => $validated['jenis_kelamin'],
@@ -73,13 +81,9 @@ class PendaftaranController extends Controller
         // 2. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
         $pendaftaran->vaksins()->attach($validated['vaksin_id']);
 
-        return redirect()->route('pendaftaran.sukses', $pendaftaran->id)
-                         ->with('success', 'Pendaftaran berhasil dikirim.');
-    }
-
-    public function sukses($id)
-    {
-        $pendaftaran = Pendaftaran::with('vaksins')->findOrFail($id);
-        return view('pendaftaran.sukses', compact('pendaftaran'));
+        return redirect()->route('pendaftaran.create')->with('sukses_modal', [
+            'nomor_registrasi' => $pendaftaran->nomor_registrasi,
+            'nama_paspor'      => $pendaftaran->nama_paspor,
+        ]);
     }
 }

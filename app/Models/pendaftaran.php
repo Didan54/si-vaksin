@@ -14,6 +14,8 @@ class Pendaftaran extends Model
         'vaksin_id',
         'nama_paspor',
         'nama_tambahan',
+        'nik',
+        'no_paspor',
         'tempat_lahir',
         'tanggal_lahir',
         'jenis_kelamin',
