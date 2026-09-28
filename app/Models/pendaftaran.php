@@ -27,6 +27,16 @@ class Pendaftaran extends Model
         'kartu_vaksin',
         'data_skrining',
         'status_pendaftaran',
+        'tekanan_darah',
+        'suhu_tubuh',
+        'denyut_nadi',
+        'spo2',
+        'nama_petugas',
+        'tgl_petugas',
+        'nama_dokter',
+        'tgl_dokter',
+        'status_kelayakan',
+        'catatan_dokter',
     ];
 
     protected $casts = [

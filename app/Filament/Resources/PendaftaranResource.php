@@ -227,6 +227,98 @@ class PendaftaranResource extends Resource
                     ->url(fn (Pendaftaran $record): string => url("/admin/pendaftaran/{$record->id}/pdf"))
                     ->openUrlInNewTab(),
 
+                // TOMBOL INPUT PEMERIKSAAN MEDIS & TANDA VITAL
+                Action::make('pemeriksaan_medis')
+                    ->label('Pemeriksaan')
+                    ->icon('heroicon-o-heart')
+                    ->color('warning')
+                    ->modalHeading(fn (Pendaftaran $record) => "Pemeriksaan Fisik & Dokter: {$record->nama_paspor}")
+                    ->modalDescription('Input tanda-tanda vital pemohon dan validasi kelayakan vaksinasi:')
+                    ->modalWidth('2xl')
+                    ->fillForm(fn (Pendaftaran $record): array => [
+                        'tekanan_darah'    => $record->tekanan_darah,
+                        'suhu_tubuh'       => $record->suhu_tubuh,
+                        'denyut_nadi'      => $record->denyut_nadi,
+                        'spo2'             => $record->spo2,
+                        'nama_petugas'     => $record->nama_petugas ?? auth()->user()->name,
+                        'tgl_petugas'      => $record->tgl_petugas ?? now()->toDateString(),
+                        'nama_dokter'      => $record->nama_dokter,
+                        'tgl_dokter'       => $record->tgl_dokter ?? now()->toDateString(),
+                        'status_kelayakan' => $record->status_kelayakan ?? 'Layak Vaksin',
+                        'catatan_dokter'   => $record->catatan_dokter,
+                    ])
+                    ->form([
+                        Forms\Components\Section::make('Tanda-Tanda Vital (Pemeriksaan Fisik)')
+                            ->description('Hasil pengukuran fisik pemohon di loket penapisan')
+                            ->schema([
+                                Forms\Components\TextInput::make('tekanan_darah')
+                                    ->label('TD (Tekanan Darah)')
+                                    ->placeholder('Contoh: 120/80')
+                                    ->suffix('mmHg'),
+
+                                Forms\Components\TextInput::make('suhu_tubuh')
+                                    ->label('S (Suhu Tubuh)')
+                                    ->placeholder('Contoh: 36.5')
+                                    ->suffix('°C'),
+
+                                Forms\Components\TextInput::make('denyut_nadi')
+                                    ->label('N (Denyut Nadi)')
+                                    ->placeholder('Contoh: 80')
+                                    ->suffix('x/mnt'),
+
+                                Forms\Components\TextInput::make('spo2')
+                                    ->label('SpO2 (Saturasi Oksigen)')
+                                    ->placeholder('Contoh: 98')
+                                    ->suffix('%'),
+                            ])->columns(4),
+
+                        Forms\Components\Section::make('Verifikasi Petugas & Dokter')
+                            ->schema([
+                                Forms\Components\TextInput::make('nama_petugas')
+                                    ->label('Diisi Oleh (Petugas)')
+                                    ->placeholder('Nama lengkap petugas skrining'),
+
+                                Forms\Components\DatePicker::make('tgl_petugas')
+                                    ->label('Tanggal Petugas')
+                                    ->displayFormat('d/m/Y'),
+
+                                Forms\Components\TextInput::make('nama_dokter')
+                                    ->label('Diverifikasi Oleh (Dokter)')
+                                    ->placeholder('Nama dokter pemeriksa'),
+
+                                Forms\Components\DatePicker::make('tgl_dokter')
+                                    ->label('Tanggal Dokter')
+                                    ->displayFormat('d/m/Y'),
+                            ])->columns(2),
+
+                        Forms\Components\Section::make('Kelayakan Vaksinasi')
+                            ->schema([
+                                Forms\Components\Select::make('status_kelayakan')
+                                    ->label('Kesimpulan / Rekomendasi Medis')
+                                    ->options([
+                                        'Layak Vaksin' => 'Layak Diberikan Vaksinasi',
+                                        'Ditunda'      => 'Ditunda (Kondisi Medis Memerlukan Observasi)',
+                                        'Tidak Layak'  => 'Tidak Layak Vaksin (Kontraindikasi Berat)',
+                                    ])
+                                    ->native(false)
+                                    ->required(),
+
+                                Forms\Components\Textarea::make('catatan_dokter')
+                                    ->label('Catatan Dokter / Keterangan Khusus')
+                                    ->placeholder('Tuliskan catatan tambahan jika ada...')
+                                    ->rows(2),
+                            ]),
+                    ])
+                    ->action(function (Pendaftaran $record, array $data) {
+                        $record->update($data);
+
+                        Notification::make()
+                            ->title('Data Pemeriksaan Disimpan')
+                            ->body("Hasil pemeriksaan fisik untuk {$record->nama_paspor} berhasil diperbarui.")
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

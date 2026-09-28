@@ -1,0 +1,79 @@
+/* ==========================================================================
+   TEMA DASHBOARD BKK SORONG (PRESISI SNEAT UI)
+   ========================================================================== */
+
+/* 1. PENYELARASAN TINGGI HEADER (KIRI & KANAN RATA SEJAJAR 64px) */
+.fi-sidebar-header,
+.fi-topbar {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    box-sizing: border-box !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* Posisikan Logo & Teks Tepat di Tengah Vertikal */
+.fi-sidebar-header {
+    display: flex !important;
+    align-items: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* 2. Menu Item Sidebar Berbentuk Kapsul Melengkung (Sneat Style) */
+.fi-sidebar-item {
+    margin-bottom: 4px !important;
+}
+
+.fi-sidebar-item-button {
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-weight: 500 !important;
+    font-size: 13.5px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Hover Menu Non-Aktif */
+.fi-sidebar-item-button:hover {
+    background-color: #f0fdfa !important;
+    color: #0f766e !important;
+    transform: translateX(3px);
+}
+
+/* 3. MENU AKTIF (Teks & Ikon Dibuat Putih Terang Kontras) */
+.fi-sidebar-item-active .fi-sidebar-item-button,
+.fi-sidebar-item-button[aria-current="page"] {
+    background: linear-gradient(72.47deg, #0d9488 0%, #14b8a6 100%) !important;
+    box-shadow: 0 4px 12px 0 rgba(13, 148, 136, 0.35) !important;
+}
+
+/* Memastikan Tulisan dan Ikon di Menu Aktif Selalu Putih Bersih */
+.fi-sidebar-item-active .fi-sidebar-item-button *,
+.fi-sidebar-item-button[aria-current="page"] * {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* 4. Label Kategori Sidebar */
+.fi-sidebar-group-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: #94a3b8 !important;
+    padding-top: 14px !important;
+}
+
+/* 5. Kartu Statistik & Widget */
+.fi-wi-stats-overview-stat,
+.fi-ta-ctn {
+    border-radius: 16px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.06) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px 0 rgba(67, 89, 113, 0.12) !important;
+}

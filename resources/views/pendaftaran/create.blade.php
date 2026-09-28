@@ -56,7 +56,7 @@
                            placeholder="16 digit NIK sesuai KTP" 
                            maxlength="16" 
                            pattern="[0-9]{16}" 
-                           title="Harap masukkan 16 digit angka NIK"
+                           title="Harap masukkan 16 digit angka NIK" 
                            required 
                            value="{{ old('nik') }}">
                     @error('nik')
@@ -117,54 +117,102 @@
 
             <!-- 2. UNGGAH BERKAS PERSYARATAN -->
             <h5 class="section-title">2. Unggah 4 Berkas Persyaratan</h5>
-            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 1 MB per dokumen).</p>
+            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 5 MB per dokumen).</p>
             
             <div class="row g-3 mb-4">
+                <!-- 1. Tanda Terima SINKARKES -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Tanda Terima Pendaftaran SINKARKES <span class="text-danger">*</span></label>
-                    <input type="file" 
-                           name="file_sinkarkes_terima" 
-                           class="form-control @error('file_sinkarkes_terima') is-invalid @enderror" 
-                           required 
-                           accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="position-relative">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
+                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
+                            </span>
+                            <input type="text" class="form-control bg-white @error('file_sinkarkes_terima') is-invalid @enderror" id="preview_sinkarkes_terima" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
+                        </div>
+                        <input type="file" 
+                               name="file_sinkarkes_terima" 
+                               id="file_sinkarkes_terima" 
+                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                               style="cursor: pointer; z-index: 5;"
+                               accept=".pdf,.jpg,.jpeg,.png" 
+                               required 
+                               onchange="updateNamaBerkas(this, 'preview_sinkarkes_terima')">
+                    </div>
                     @error('file_sinkarkes_terima')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
+                <!-- 2. Formulir SINKARKES -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Formulir Pendaftaran SINKARKES <span class="text-danger">*</span></label>
-                    <input type="file" 
-                           name="file_sinkarkes_form" 
-                           class="form-control @error('file_sinkarkes_form') is-invalid @enderror" 
-                           required 
-                           accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="position-relative">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
+                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
+                            </span>
+                            <input type="text" class="form-control bg-white @error('file_sinkarkes_form') is-invalid @enderror" id="preview_sinkarkes_form" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
+                        </div>
+                        <input type="file" 
+                               name="file_sinkarkes_form" 
+                               id="file_sinkarkes_form" 
+                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                               style="cursor: pointer; z-index: 5;"
+                               accept=".pdf,.jpg,.jpeg,.png" 
+                               required 
+                               onchange="updateNamaBerkas(this, 'preview_sinkarkes_form')">
+                    </div>
                     @error('file_sinkarkes_form')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
+                <!-- 3. Paspor Pemohon -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Paspor Pemohon <span class="text-danger">*</span></label>
-                    <input type="file" 
-                           name="file_paspor" 
-                           class="form-control @error('file_paspor') is-invalid @enderror" 
-                           required 
-                           accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="position-relative">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
+                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
+                            </span>
+                            <input type="text" class="form-control bg-white @error('file_paspor') is-invalid @enderror" id="preview_paspor" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
+                        </div>
+                        <input type="file" 
+                               name="file_paspor" 
+                               id="file_paspor" 
+                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                               style="cursor: pointer; z-index: 5;"
+                               accept=".pdf,.jpg,.jpeg,.png" 
+                               required 
+                               onchange="updateNamaBerkas(this, 'preview_paspor')">
+                    </div>
                     @error('file_paspor')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
+                <!-- 4. KTP Pemohon -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">KTP Pemohon <span class="text-danger">*</span></label>
-                    <input type="file" 
-                           name="file_ktp" 
-                           class="form-control @error('file_ktp') is-invalid @enderror" 
-                           required 
-                           accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="position-relative">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
+                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
+                            </span>
+                            <input type="text" class="form-control bg-white @error('file_ktp') is-invalid @enderror" id="preview_ktp" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
+                        </div>
+                        <input type="file" 
+                               name="file_ktp" 
+                               id="file_ktp" 
+                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                               style="cursor: pointer; z-index: 5;"
+                               accept=".pdf,.jpg,.jpeg,.png" 
+                               required 
+                               onchange="updateNamaBerkas(this, 'preview_ktp')">
+                    </div>
                     @error('file_ktp')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -179,7 +227,7 @@
                                type="checkbox" 
                                name="kartu_vaksin[]" 
                                value="e-ICV" 
-                               id="cek_eicv"
+                               id="cek_eicv" 
                                {{ (is_array(old('kartu_vaksin')) && in_array('e-ICV', old('kartu_vaksin'))) ? 'checked' : '' }}>
                         <label class="form-check-label fw-semibold" for="cek_eicv">
                             Membawa / Memiliki Sertifikat Elektronik (e-ICV)
@@ -190,7 +238,7 @@
                                type="checkbox" 
                                name="kartu_vaksin[]" 
                                value="ICV" 
-                               id="cek_icv"
+                               id="cek_icv" 
                                {{ (is_array(old('kartu_vaksin')) && in_array('ICV', old('kartu_vaksin'))) ? 'checked' : '' }}>
                         <label class="form-check-label fw-semibold" for="cek_icv">
                             Membawa Kartu / Buku Kuning Fisik (ICV)
@@ -217,7 +265,7 @@
                                class="form-control bg-white @error('tanggal_kunjungan') is-invalid @enderror" 
                                placeholder="Pilih tanggal kedatangan Anda..." 
                                required 
-                               value="{{ old('tanggal_kunjungan') }}"
+                               value="{{ old('tanggal_kunjungan') }}" 
                                style="cursor: pointer;">
                     </div>
                     @error('tanggal_kunjungan')
@@ -335,7 +383,7 @@
                                                type="radio" 
                                                name="skrining[10]" 
                                                id="q10_ya" 
-                                               value="Ya"
+                                               value="Ya" 
                                                {{ old('skrining.10') == 'Ya' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="q10_ya">Ya</label>
                                     </div>
@@ -344,7 +392,7 @@
                                                type="radio" 
                                                name="skrining[10]" 
                                                id="q10_tidak" 
-                                               value="Tidak"
+                                               value="Tidak" 
                                                {{ old('skrining.10') == 'Tidak' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="q10_tidak">Tidak</label>
                                     </div>
@@ -414,6 +462,17 @@
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
 <script>
+// Fungsi untuk menampilkan nama file yang diunggah pemohon
+function updateNamaBerkas(input, targetId) {
+    const preview = document.getElementById(targetId);
+    if (input.files && input.files[0]) {
+        preview.value = input.files[0].name;
+        preview.classList.remove('is-invalid');
+    } else {
+        preview.value = '';
+    }
+}
+
 function filterGender() {
     const genderSelect = document.getElementById('jenis_kelamin');
     const barisQ10 = document.getElementById('baris-q10');
