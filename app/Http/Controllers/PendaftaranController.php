@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
 use App\Models\Vaksin;
+use App\Models\HariLibur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -13,7 +14,9 @@ class PendaftaranController extends Controller
     public function create()
     {
         $daftarVaksin = Vaksin::all();
-        return view('pendaftaran.create', compact('daftarVaksin'));
+
+        $daftarLibur = \App\Models\HariLibur::pluck('tanggal')->toArray();
+        return view('pendaftaran.create', compact('daftarVaksin', 'daftarLibur'));
     }
 
     public function store(Request $request)
@@ -34,6 +37,7 @@ class PendaftaranController extends Controller
             'tempat_lahir'          => 'required|string|max:100',
             'tanggal_lahir'         => 'required|date',
             'jenis_kelamin'         => 'required|in:L,P',
+            'tanggal_kunjungan'     => 'required|date',
             'file_sinkarkes_terima' => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_sinkarkes_form'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_paspor'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
@@ -64,11 +68,12 @@ class PendaftaranController extends Controller
             'nomor_registrasi'      => $noRegistrasi,
             'nama_paspor'           => $validated['nama_paspor'],
             'nama_tambahan'         => $validated['nama_tambahan'],
-            'nik'                   => $validated['nik'],          // <- SUDAH DITAMBAHKAN
-            'no_paspor'             => $validated['no_paspor'],    // <- SUDAH DITAMBAHKAN
+            'nik'                   => $validated['nik'],          
+            'no_paspor'             => $validated['no_paspor'],    
             'tempat_lahir'          => $validated['tempat_lahir'],
             'tanggal_lahir'         => $validated['tanggal_lahir'],
             'jenis_kelamin'         => $validated['jenis_kelamin'],
+            'tanggal_kunjungan'     => $validated['tanggal_kunjungan'],
             'file_sinkarkes_terima' => $berkas['file_sinkarkes_terima'],
             'file_sinkarkes_form'   => $berkas['file_sinkarkes_form'],
             'file_paspor'           => $berkas['file_paspor'],

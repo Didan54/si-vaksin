@@ -117,7 +117,7 @@
 
             <!-- 2. UNGGAH BERKAS PERSYARATAN -->
             <h5 class="section-title">2. Unggah 4 Berkas Persyaratan</h5>
-            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 5 MB per dokumen).</p>
+            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 1 MB per dokumen).</p>
             
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
@@ -200,10 +200,33 @@
                 <small class="text-muted d-block mt-2">*Biarkan kosong jika belum pernah vaksinasi internasional atau tidak membawa kartu fisik/elektronik.</small>
             </div>
 
-            <!-- 4. PILIH LAYANAN VAKSINASI (BISA PILIH LEBIH DARI 1) -->
-            <h5 class="section-title">4. Pilih Layanan Vaksinasi</h5>
-            <p class="text-muted small mb-3">Pilih satu atau beberapa jenis vaksinasi internasional yang ingin diajukan (bisa dicentang lebih dari satu):</p>
+            <!-- 4. PILIH LAYANAN & JADWAL KUNJUNGAN -->
+            <h5 class="section-title">4. Layanan & Rencana Kunjungan</h5>
+            <p class="text-muted small mb-3">Pilih tanggal rencana kedatangan dan vaksinasi yang ingin diajukan:</p>
 
+            <div class="row g-3 mb-4">
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold">Rencana Tanggal Pelayanan <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white" style="cursor: pointer;" onclick="document.getElementById('tanggal_kunjungan').focus()">
+                            <i class="bi bi-calendar2-check text-primary fs-5"></i>
+                        </span>
+                        <input type="text" 
+                               name="tanggal_kunjungan" 
+                               id="tanggal_kunjungan" 
+                               class="form-control bg-white @error('tanggal_kunjungan') is-invalid @enderror" 
+                               placeholder="Pilih tanggal kedatangan Anda..." 
+                               required 
+                               value="{{ old('tanggal_kunjungan') }}"
+                               style="cursor: pointer;">
+                    </div>
+                    @error('tanggal_kunjungan')
+                        <div class="text-danger small mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <label class="form-label fw-semibold mb-2">Pilihan Jenis Vaksinasi <span class="text-danger">*</span></label>
             <div class="row g-3 mb-2">
                 @foreach($daftarVaksin as $vaksin)
                     <div class="col-md-6">
@@ -289,6 +312,7 @@
                                                    name="skrining[{{ $no }}]" 
                                                    id="q{{ $no }}_tidak" 
                                                    value="Tidak" 
+                                                   required 
                                                    {{ old('skrining.' . $no) == 'Tidak' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="q{{ $no }}_tidak">Tidak</label>
                                         </div>
@@ -340,13 +364,13 @@
         </form>
     </div>
 </div>
+
 <!-- MODAL POP-UP SUKSES PENDAFTARAN -->
 @if(session('sukses_modal'))
 <div class="modal fade" id="modalSuksesDaftar" tabindex="-1" aria-labelledby="modalSuksesLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg text-center p-4" style="border-radius: 16px;">
             <div class="modal-body">
-                <!-- Ikon Centang -->
                 <div class="mb-3">
                     <span class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow-sm" style="width: 70px; height: 70px; font-size: 36px;">
                         <i class="bi bi-check-lg"></i>
@@ -358,13 +382,13 @@
                     Data Anda telah berhasil dicatat ke sistem. Silakan <strong>tangkap layar (screenshot)</strong> nomor registrasi berikut dan tunjukkan kepada petugas di loket verifikasi:
                 </p>
 
-                <!-- Box Nomor Registrasi -->
+                <!-- Menggunakan data_get agar aman terhadap Array maupun Objek Eloquent -->
                 <div class="p-3 mb-3 border rounded-3 bg-light">
                     <div class="text-secondary small fw-semibold text-uppercase">Nomor Registrasi Anda</div>
                     <div class="fw-bold text-success fs-3 tracking-wider py-1">
-                        {{ session('sukses_modal')['nomor_registrasi'] }}
+                        {{ data_get(session('sukses_modal'), 'nomor_registrasi') }}
                     </div>
-                    <div class="small text-muted">{{ session('sukses_modal')['nama_paspor'] }}</div>
+                    <div class="small text-muted">{{ data_get(session('sukses_modal'), 'nama_paspor') }}</div>
                 </div>
 
                 <div class="alert alert-warning small py-2 mb-4 text-start">
@@ -381,14 +405,23 @@
 @endif
 @endsection
 
-@push('scripts')
+<!-- Hubungkan ke CSS Kalender Terpisah -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="{{ asset('css/kalender-vaksin.css') }}">
+
+<!-- Library JS Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
 <script>
 function filterGender() {
-    const gender = document.getElementById('jenis_kelamin').value;
+    const genderSelect = document.getElementById('jenis_kelamin');
     const barisQ10 = document.getElementById('baris-q10');
     const radioQ10 = document.querySelectorAll('.radio-q10');
 
-    if (gender === 'P') {
+    if (!genderSelect || !barisQ10) return;
+
+    if (genderSelect.value === 'P') {
         barisQ10.style.display = 'table-row';
         radioQ10.forEach(r => r.required = true);
     } else {
@@ -403,16 +436,66 @@ function filterGender() {
 document.addEventListener('DOMContentLoaded', function() {
     filterGender();
 
-    // 1. TAMBAHKAN BAGIAN INI: Buka pop-up otomatis setelah pendaftaran berhasil dikirim
+    const daftarLibur = @json($daftarLibur ?? []);
+    
+    // Titik acuan hari ini (jam dinetralkan ke 00:00:00)
+    const hariIni = new Date();
+    hariIni.setHours(0, 0, 0, 0);
+
+    flatpickr("#tanggal_kunjungan", {
+        locale: "id",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "l, d F Y",
+        minDate: "today",
+        monthSelectorType: "static", // Mengubah dropdown bulan menjadi teks biasa
+        disable: [
+            // Kunci Sabtu (6) dan Minggu (0)
+            function(date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            },
+            // Kunci hari libur database admin
+            function(date) {
+                let d = date.getDate().toString().padStart(2, '0');
+                let m = (date.getMonth() + 1).toString().padStart(2, '0');
+                let y = date.getFullYear();
+                let dateString = `${y}-${m}-${d}`;
+                return daftarLibur.includes(dateString);
+            }
+        ],
+        // Pasang class warna khusus untuk tiap sel tanggal
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+            const tgl = dayElem.dateObj;
+            tgl.setHours(0, 0, 0, 0);
+
+            const d = tgl.getDate().toString().padStart(2, '0');
+            const m = (tgl.getMonth() + 1).toString().padStart(2, '0');
+            const y = tgl.getFullYear();
+            const dateString = `${y}-${m}-${d}`;
+            const hari = tgl.getDay();
+
+            if (tgl < hariIni) {
+                dayElem.classList.add('tgl-lewat');
+            } else if (daftarLibur.includes(dateString)) {
+                dayElem.classList.add('tgl-libur-merah');
+                dayElem.title = "Libur Resmi / Ketetapan Pemda PBD";
+            } else if (hari === 0 || hari === 6) {
+                dayElem.classList.add('tgl-weekend');
+                dayElem.title = "Libur Akhir Pekan";
+            } else {
+                dayElem.classList.add('tgl-aktif');
+            }
+        }
+    });
+
     @if(session('sukses_modal'))
         const modalElement = document.getElementById('modalSuksesDaftar');
-        if (modalElement) {
+        if (modalElement && typeof bootstrap !== 'undefined') {
             const modalSukses = new bootstrap.Modal(modalElement);
             modalSukses.show();
         }
     @endif
 
-    // 2. Otomatis geser (scroll) dan beri fokus ke input pertama yang terdeteksi error
     const firstInvalid = document.querySelector('.is-invalid, .text-danger.small');
     if (firstInvalid) {
         firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -422,4 +505,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
