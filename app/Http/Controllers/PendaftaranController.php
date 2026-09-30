@@ -8,6 +8,8 @@ use App\Models\HariLibur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Filament\Notifications\Notification;
+use App\Models\User;
 
 class PendaftaranController extends Controller
 {
@@ -22,7 +24,7 @@ class PendaftaranController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // Validasi: Wajib memilih minimal 1 checkbox, dan tiap pilihan harus aktif di database
+            // ... (validasi tetap sama)
             'vaksin_id'   => 'required|array|min:1',
             'vaksin_id.*' => [
                 'required',
@@ -30,14 +32,14 @@ class PendaftaranController extends Controller
                     $query->where('is_aktif', true);
                 }),
             ],
-            'nama_paspor'           => 'required|string|max:150',
-            'nama_tambahan'         => 'required|string|max:150',
-            'nik'                   => 'required|numeric|digits:16',
-            'no_paspor'             => 'required|string|max:25',
-            'tempat_lahir'          => 'required|string|max:100',
-            'tanggal_lahir'         => 'required|date',
-            'jenis_kelamin'         => 'required|in:L,P',
-            'tanggal_kunjungan'     => 'required|date',
+            'nama_paspor'         => 'required|string|max:150',
+            'nama_tambahan'       => 'required|string|max:150',
+            'nik'                 => 'required|numeric|digits:16',
+            'no_paspor'           => 'required|string|max:25',
+            'tempat_lahir'        => 'required|string|max:100',
+            'tanggal_lahir'       => 'required|date',
+            'jenis_kelamin'       => 'required|in:L,P',
+            'tanggal_kunjungan'   => 'required|date',
             'file_sinkarkes_terima' => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_sinkarkes_form'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
             'file_paspor'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:1120',
@@ -85,6 +87,23 @@ class PendaftaranController extends Controller
 
         // 2. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
         $pendaftaran->vaksins()->attach($validated['vaksin_id']);
+
+        // 3. KIRIM NOTIFIKASI KE SEMUA AKUN ADMIN
+        $admins = User::all(); // Anda bisa memfilter berdasarkan role jika punya sistem role
+        foreach ($admins as $admin) {
+            Notification::make()
+                ->title('Pendaftaran Vaksin Baru Masuk!')
+                ->body('Pemohon: ' . $pendaftaran->nama_paspor . ' (' . $pendaftaran->nomor_registrasi . ')')
+                ->success()
+                ->icon('heroicon-o-bell-alert')
+                ->actions([
+                    \Filament\Notifications\Actions\Action::make('view')
+                        ->button()
+                        ->label('Lihat Detail')
+                        ->url(route('filament.admin.resources.pendaftarans.index')) // Sesuaikan dengan nama route resource anda
+                ])
+                ->sendToDatabase($admin);
+        }
 
         return redirect()->route('pendaftaran.create')->with('sukses_modal', [
             'nomor_registrasi' => $pendaftaran->nomor_registrasi,

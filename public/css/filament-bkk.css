@@ -1,26 +1,46 @@
 /* ==========================================================================
-   TEMA DASHBOARD BKK SORONG (PRESISI SNEAT UI)
+   TEMA DASHBOARD BKK SORONG (SNEAT UI & KEMENKES BRANDING)
    ========================================================================== */
 
-/* 1. PENYELARASAN TINGGI HEADER (KIRI & KANAN RATA SEJAJAR 64px) */
-.fi-sidebar-header,
+/* 1. PENYELARASAN HEADER & TOPBAR */
 .fi-topbar {
     height: 64px !important;
     min-height: 64px !important;
     max-height: 64px !important;
-    box-sizing: border-box !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Posisikan Logo & Teks Tepat di Tengah Vertikal */
+/* 2. HEADER SIDEBAR */
 .fi-sidebar-header {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
     display: flex !important;
     align-items: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 0 16px !important;
 }
 
-/* 2. Menu Item Sidebar Berbentuk Kapsul Melengkung (Sneat Style) */
+/* Penyesuaian header saat sidebar dalam kondisi collapse (tertutup) */
+.fi-sidebar-closeable:not(.fi-sidebar-open) .fi-sidebar-header {
+    padding: 0 8px !important;
+    justify-content: center !important;
+}
+
+/* Tombol Collapse Bawaan */
+.fi-sidebar-header button {
+    color: #94a3b8 !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-sidebar-header button:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 3. MENU ITEM SIDEBAR (GAYA KAPSUL SNEAT) */
 .fi-sidebar-item {
     margin-bottom: 4px !important;
 }
@@ -30,45 +50,44 @@
     padding: 10px 14px !important;
     font-weight: 500 !important;
     font-size: 13.5px !important;
-    transition: all 0.2s ease-in-out !important;
+    transform: translateX(0);
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out !important;
 }
 
-/* Hover Menu Non-Aktif */
 .fi-sidebar-item-button:hover {
-    background-color: #f0fdfa !important;
-    color: #0f766e !important;
-    transform: translateX(3px);
+    background-color: rgba(20, 184, 166, 0.1) !important;
+    color: #14b8a6 !important;
+    transform: translateX(3px) !important;
 }
 
-/* 3. MENU AKTIF (Teks & Ikon Dibuat Putih Terang Kontras) */
+/* Menu Aktif (Pill Toska Bersinar) */
 .fi-sidebar-item-active .fi-sidebar-item-button,
 .fi-sidebar-item-button[aria-current="page"] {
     background: linear-gradient(72.47deg, #0d9488 0%, #14b8a6 100%) !important;
     box-shadow: 0 4px 12px 0 rgba(13, 148, 136, 0.35) !important;
 }
 
-/* Memastikan Tulisan dan Ikon di Menu Aktif Selalu Putih Bersih */
 .fi-sidebar-item-active .fi-sidebar-item-button *,
 .fi-sidebar-item-button[aria-current="page"] * {
     color: #ffffff !important;
     font-weight: 600 !important;
 }
 
-/* 4. Label Kategori Sidebar */
+/* 4. LABEL KATEGORI */
 .fi-sidebar-group-label {
     font-size: 11px !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    color: #94a3b8 !important;
+    color: #64748b !important;
     padding-top: 14px !important;
 }
 
-/* 5. Kartu Statistik & Widget */
+/* 5. KARTU STATISTIK & CONTAINER TABEL */
 .fi-wi-stats-overview-stat,
 .fi-ta-ctn {
     border-radius: 16px !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
     box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.06) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
@@ -76,4 +95,34 @@
 .fi-wi-stats-overview-stat:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 14px 0 rgba(67, 89, 113, 0.12) !important;
+}
+
+/* ==========================================================================
+   PERBAIKAN FINAL HEADER SAAT SIDEBAR DITUTUP
+   ========================================================================== */
+
+/* Pastikan tinggi header tetap konsisten 64px dan tidak memanjang ke bawah */
+aside.fi-sidebar:not([style*="width: 17rem"]) .fi-sidebar-header {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Geser posisi pembungkus logo agar lebih ke tengah saat sidebar ditutup */
+aside.fi-sidebar:not([style*="width: 17rem"]) .fi-sidebar-header > div:first-child {
+    display: flex !important;
+    align-items: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-left: 6px !important; /* Geser sedikit agar lebih ke tengah */
+}
+
+/* Sesuaikan posisi tombol panah agar ikut bergeser secara proporsional */
+aside.fi-sidebar:not([style*="width: 17rem"]) .fi-sidebar-header button {
+    margin-right: 2px !important;
 }
