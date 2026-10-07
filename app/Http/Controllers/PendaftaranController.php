@@ -59,7 +59,7 @@ class PendaftaranController extends Controller
         $berkas = [];
         foreach (['file_sinkarkes_terima', 'file_sinkarkes_form', 'file_paspor', 'file_ktp'] as $fileKey) {
             if ($request->hasFile($fileKey)) {
-                $berkas[$fileKey] = $request->file($fileKey)->store('lampiran_berkas', 'public');
+                $berkas[$fileKey] = $request->file($fileKey)->store('lampiran_berkas');
             }
         }
 

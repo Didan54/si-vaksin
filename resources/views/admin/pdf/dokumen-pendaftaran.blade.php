@@ -55,7 +55,6 @@
         <tr>
             <td>Nomor Paspor</td>
             <td>:</td>
-            <td>:</td>
             <td class="fw-bold">{{ $pendaftaran->no_paspor }}</td>
         </tr>
         <tr>

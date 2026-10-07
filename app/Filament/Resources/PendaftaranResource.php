@@ -232,43 +232,54 @@ class PendaftaranResource extends Resource
                         ->modalHeading(fn (Pendaftaran $record) => "Berkas SINKARKES: {$record->nama_paspor}")
                         ->modalDescription('Periksa kelengkapan tanda terima dan formulir pendaftaran dari Kemenkes:')
                         ->modalWidth('lg')
-                        ->modalContent(fn (Pendaftaran $record) => new HtmlString('
-                            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
-                                <!-- Berkas 1: Tanda Terima -->
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <div style="font-weight: 700; font-size: 14px; color: #1e293b;">1. Tanda Terima Pendaftaran SINKARKES</div>
-                                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Bukti registrasi resmi Kemenkes</div>
-                                        </div>
-                                        ' . ($record->file_sinkarkes_terima ? '
-                                            <a href="' . asset('storage/' . $record->file_sinkarkes_terima) . '" target="_blank"
-                                               style="display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
-                                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                                Buka File &nearr;
-                                            </a>
-                                        ' : '<span style="color: #ef4444; font-size: 12px; font-weight: 600;">Belum diunggah</span>') . '
-                                    </div>
-                                </div>
+                        ->modalContent(function (Pendaftaran $record) {
+                            // Buat URL privat atau fallback publik
+                            $urlTerima = $record->file_sinkarkes_terima 
+                                ? route('dokumen.privat', ['path' => basename($record->file_sinkarkes_terima)]) 
+                                : null;
 
-                                <!-- Berkas 2: Formulir Pendaftaran -->
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <div style="font-weight: 700; font-size: 14px; color: #1e293b;">2. Formulir Pendaftaran SINKARKES</div>
-                                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Formulir rincian data pemohon</div>
+                            $urlForm = $record->file_sinkarkes_form 
+                                ? route('dokumen.privat', ['path' => basename($record->file_sinkarkes_form)]) 
+                                : null;
+
+                            return new HtmlString('
+                                <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+                                    <!-- Berkas 1: Tanda Terima -->
+                                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 700; font-size: 14px; color: #1e293b;">1. Tanda Terima Pendaftaran SINKARKES</div>
+                                                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Bukti registrasi resmi Kemenkes</div>
+                                            </div>
+                                            ' . ($urlTerima ? '
+                                                <a href="' . $urlTerima . '" target="_blank"
+                                                style="display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
+                                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                    Buka File &nearr;
+                                                </a>
+                                            ' : '<span style="color: #ef4444; font-size: 12px; font-weight: 600;">Belum diunggah</span>') . '
                                         </div>
-                                        ' . ($record->file_sinkarkes_form ? '
-                                            <a href="' . asset('storage/' . $record->file_sinkarkes_form) . '" target="_blank"
-                                               style="display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
-                                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                                Buka File &nearr;
-                                            </a>
-                                        ' : '<span style="color: #ef4444; font-size: 12px; font-weight: 600;">Belum diunggah</span>') . '
+                                    </div>
+
+                                    <!-- Berkas 2: Formulir Pendaftaran -->
+                                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 700; font-size: 14px; color: #1e293b;">2. Formulir Pendaftaran SINKARKES</div>
+                                                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Formulir rincian data pemohon</div>
+                                            </div>
+                                            ' . ($urlForm ? '
+                                                <a href="' . $urlForm . '" target="_blank"
+                                                style="display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
+                                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                    Buka File &nearr;
+                                                </a>
+                                            ' : '<span style="color: #ef4444; font-size: 12px; font-weight: 600;">Belum diunggah</span>') . '
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        '))
+                            ');
+                        })
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Tutup'),
 

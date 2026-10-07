@@ -12,20 +12,9 @@ class PendaftaranPdfController extends Controller
     {
         $pendaftaran = Pendaftaran::with('vaksins')->findOrFail($id);
 
-        // Helper untuk mengubah gambar storage ke base64 agar aman dirender oleh DomPDF di Windows
-        $pasporBase64 = null;
-        if ($pendaftaran->file_paspor && Storage::disk('public')->exists($pendaftaran->file_paspor)) {
-            $type = pathinfo($pendaftaran->file_paspor, PATHINFO_EXTENSION);
-            $data = Storage::disk('public')->get($pendaftaran->file_paspor);
-            $pasporBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
-
-        $ktpBase64 = null;
-        if ($pendaftaran->file_ktp && Storage::disk('public')->exists($pendaftaran->file_ktp)) {
-            $type = pathinfo($pendaftaran->file_ktp, PATHINFO_EXTENSION);
-            $data = Storage::disk('public')->get($pendaftaran->file_ktp);
-            $ktpBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
+        // Ambil gambar base64 dengan mengecek disk private maupun public
+        $pasporBase64 = $this->convertFileToBase64($pendaftaran->file_paspor);
+        $ktpBase64    = $this->convertFileToBase64($pendaftaran->file_ktp);
 
         $pertanyaanSkrining = [
             1 => 'Apakah anda sedang sakit hari ini?',
@@ -48,5 +37,36 @@ class PendaftaranPdfController extends Controller
         ))->setPaper('a4', 'portrait');
 
         return $pdf->stream("Berkas-{$pendaftaran->nomor_registrasi}.pdf");
+    }
+
+    /**
+     * Helper fleksibel membaca file baik di storage privat maupun publik
+     */
+    private function convertFileToBase64(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        // Jika format berkas adalah PDF, jangan ubah ke base64 image (tag img akan rusak)
+        if ($extension === 'pdf') {
+            return null;
+        }
+
+        // 1. Cek di disk default / private (storage/app/...)
+        if (Storage::exists($path)) {
+            $data = Storage::get($path);
+            return 'data:image/' . $extension . ';base64,' . base64_encode($data);
+        }
+
+        // 2. Cek di disk public (storage/app/public/...) jika file lama
+        if (Storage::disk('public')->exists($path)) {
+            $data = Storage::disk('public')->get($path);
+            return 'data:image/' . $extension . ';base64,' . base64_encode($data);
+        }
+
+        return null;
     }
 }

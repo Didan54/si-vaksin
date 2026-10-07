@@ -1,7 +1,7 @@
 <footer id="bantuan" class="footer-wrapper position-relative overflow-hidden">
     
-    <!-- ORNAMEN SUDUT: Dibuat menyatu di pojok kiri bawah tanpa terpotong garis copyright -->
-    <div class="footer-ornamen-bg">
+    <!-- ORNAMEN SUDUT: Otomatis sembunyi di layar kecil (d-none) dan hanya tampil di layar desktop (d-md-block) agar tidak menabrak logo lain -->
+    <div class="footer-ornamen-bg d-none d-md-block pointer-events-none" style="pointer-events: none;">
         <img src="{{ asset('images/Logo-Pojok.png') }}" 
              alt="Ornamen Kemenkes" 
              onerror="this.src='{{ asset('images/logo-pojok.jpeg') }}'">
@@ -10,7 +10,7 @@
     <div class="container py-4 position-relative" style="z-index: 2;">
         <div class="row g-4">
             
-            <!-- Kolom 1: Alamat & Kontak (col-lg-5 col-md-5) -->
+            <!-- Kolom 1: Alamat & Kontak -->
             <div class="col-lg-5 col-md-5 col-12">
                 <h6 class="text-uppercase font-utama">Balai Kekarantinaan Kesehatan Sorong</h6>
                 <p class="small text-white-50 mb-3">
@@ -23,7 +23,7 @@
                 </div>
             </div>
 
-            <!-- Kolom 2: Tautan Terkait (col-lg-3 col-md-3) -->
+            <!-- Kolom 2: Tautan Terkait -->
             <div class="col-lg-3 col-md-3 col-12">
                 <h6 class="text-uppercase font-utama">Layanan & Tautan</h6>
                 <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
@@ -34,14 +34,14 @@
                 </ul>
             </div>
 
-            <!-- Kolom 3: Media Sosial (col-lg-4 col-md-4) -->
+            <!-- Kolom 3: Media Sosial -->
             <div class="col-lg-4 col-md-4 col-12">
                 <h6 class="text-uppercase font-utama">Media Sosial & Bantuan</h6>
                 <p class="small text-white-50 mb-3">Saluran resmi informasi vaksinasi dan kekarantinaan:</p>
                 
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <a href="https://www.instagram.com/bkksorong" class="social-icon" title="Instagram" target="_blank"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-icon" title="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="https://www.facebook.com/share/1GRFK5qAbh/" class="social-icon" title="Facebook"><i class="bi bi-facebook"></i></a>
                     <a href="https://www.youtube.com/@bkksorong" class="social-icon" title="YouTube" target="_blank"><i class="bi bi-youtube"></i></a>
                     <a href="https://api.whatsapp.com/send?phone=6282199369946" target="_blank" class="social-icon bg-success text-white" title="WhatsApp Pelayanan"><i class="bi bi-whatsapp"></i></a>
                 </div>
@@ -49,28 +49,30 @@
 
         </div>
 
-        <!-- BARIS RESMI: Core Values ASN di Sisi Kanan -->
+        <!-- BARIS RESMI: Core Values ASN di Sisi Kanan (Responsif dan Tidak Menabrak) -->
         <div class="row pt-3 mt-3 align-items-center border-top" style="border-color: rgba(255, 255, 255, 0.12) !important;">
             <div class="col-12 d-flex justify-content-center justify-content-md-end align-items-center gap-3 flex-wrap">
                 <img src="{{ asset('images/Logo-BerAKHLAK-white.png') }}" 
                      alt="Logo BerAKHLAK" 
                      title="BerAKHLAK" 
-                     style="height: 42px; width: auto; object-fit: contain;" 
+                     class="img-fluid"
+                     style="height: 32px; max-height: 40px; width: auto; object-fit: contain;" 
                      onerror="this.style.display='none'">
 
                 <img src="{{ asset('images/logo-bameba-white.png') }}" 
                      alt="Logo Bangga Melayani Bangsa" 
                      title="#BanggaMelayaniBangsa" 
-                     style="height: 42px; width: auto; object-fit: contain;" 
+                     class="img-fluid"
+                     style="height: 32px; max-height: 40px; width: auto; object-fit: contain;" 
                      onerror="this.style.display='none'">
             </div>
         </div>
     </div>
 
     <!-- Baris Bawah Hak Cipta -->
-    <div class="footer-bottom text-center text-white-50 position-relative" style="z-index: 2;">
-        <div class="container">
-            Copyright &copy; {{ date('Y') }} Balai Kekarantinaan Kesehatan Kelas II Sorong. All Rights Reserved.
+    <div class="footer-bottom py-3 text-center text-white-50 position-relative" style="z-index: 2;">
+        <div class="container small">
+            Copyright &copy; {{ date('Y') }} Balai Kekarantinaan Kesehatan Kelas I Sorong. All Rights Reserved.
         </div>
     </div>
 </footer>
