@@ -7,7 +7,7 @@
     
     <div class="card-form-header">
         <h5 class="mb-1 font-utama"><i class="bi bi-file-earmark-medical me-2"></i>Formulir Pendaftaran & Penapisan</h5>
-        <p class="mb-0 small text-white-50">Lengkapi data diri sesuai paspor dan periksa kondisi kesehatan Anda.</p>
+        <p class="mb-0 small text-white-65">Lengkapi data diri sesuai paspor dan periksa kondisi kesehatan Anda.</p>
     </div>
 
     <div class="card-body p-4">
@@ -117,7 +117,7 @@
 
             <!-- 2. UNGGAH BERKAS PERSYARATAN -->
             <h5 class="section-title">2. Unggah 4 Berkas Persyaratan</h5>
-            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 5 MB per dokumen).</p>
+            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 1 MB per dokumen).</p>
             
             <div class="row g-3 mb-4">
                 <!-- 1. Tanda Terima SINKARKES -->
@@ -135,7 +135,7 @@
                                id="file_sinkarkes_terima" 
                                class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
                                style="cursor: pointer; z-index: 5;"
-                               accept=".pdf,.jpg,.jpeg,.png" 
+                               accept="application/pdf" 
                                required 
                                onchange="updateNamaBerkas(this, 'preview_sinkarkes_terima')">
                     </div>
@@ -159,7 +159,7 @@
                                id="file_sinkarkes_form" 
                                class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
                                style="cursor: pointer; z-index: 5;"
-                               accept=".pdf,.jpg,.jpeg,.png" 
+                               accept="application/pdf" 
                                required 
                                onchange="updateNamaBerkas(this, 'preview_sinkarkes_form')">
                     </div>
@@ -450,6 +450,31 @@
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    function bukaModalSukses() {
+        const modalEl = document.getElementById('modalSuksesDaftar');
+        if (!modalEl) return;
+
+        if (window.bootstrap && window.bootstrap.Modal) {
+            const modalObj = new bootstrap.Modal(modalEl);
+            modalObj.show();
+        } else if (window.jQuery && typeof jQuery.fn.modal !== 'undefined') {
+            $('#modalSuksesDaftar').modal('show');
+        } else {
+            // Coba lagi setelah 150ms jika berkas bundle bootstrap belum selesai terunduh
+            setTimeout(bukaModalSukses, 150);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bukaModalSukses);
+    } else {
+        bukaModalSukses();
+    }
+})();
+</script>
 @endif
 @endsection
 
@@ -462,14 +487,42 @@
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
 <script>
-// Fungsi untuk menampilkan nama file yang diunggah pemohon
+// Fungsi untuk validasi ukuran (maks 1MB), format PDF Sinkarkes, dan menampilkan nama file
 function updateNamaBerkas(input, targetId) {
     const preview = document.getElementById(targetId);
+    const maxUkuran = 1 * 1024 * 1024; // 1 MB (dalam bytes)
+
     if (input.files && input.files[0]) {
-        preview.value = input.files[0].name;
-        preview.classList.remove('is-invalid');
+        const file = input.files[0];
+
+        // 1. Validasi Batas Ukuran 1 MB Langsung Saat Dipilih
+        if (file.size > maxUkuran) {
+            const ukuranAsliMB = (file.size / (1024 * 1024)).toFixed(2);
+            alert(`Ukuran berkas terlalu besar (${ukuranAsliMB} MB)!\nMaksimal ukuran berkas yang diperbolehkan adalah 1 MB. Silakan pilih atau kompres berkas terlebih dahulu.`);
+            input.value = ''; // Kosongkan file input
+            if (preview) preview.value = '';
+            return;
+        }
+
+        // 2. Validasi Khusus Berkas SINKARKES (Hanya Boleh PDF)
+        const idInput = input.id || input.name;
+        if (idInput.includes('sinkarkes')) {
+            const ekstensi = file.name.split('.').pop().toLowerCase();
+            if (file.type !== 'application/pdf' && ekstensi !== 'pdf') {
+                alert('Peringatan: Berkas SINKARKES wajib berupa dokumen PDF!');
+                input.value = ''; // Kosongkan file input
+                if (preview) preview.value = '';
+                return;
+            }
+        }
+
+        // Jika lolos validasi, tampilkan nama file di kolom preview
+        if (preview) {
+            preview.value = file.name;
+            preview.classList.remove('is-invalid');
+        }
     } else {
-        preview.value = '';
+        if (preview) preview.value = '';
     }
 }
 
