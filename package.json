@@ -1,8 +1,9 @@
 {
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "echo 'Assets ready'"
+        "build": "vite build"
     },
     "devDependencies": {
         "axios": "^1.6.4",
