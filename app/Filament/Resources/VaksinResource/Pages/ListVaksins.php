@@ -13,7 +13,10 @@ class ListVaksins extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Tambah Vaksin')
+                ->modalHeading('Tambah Layanan Vaksin Baru')
+                ->modalWidth('md'),
         ];
     }
 }

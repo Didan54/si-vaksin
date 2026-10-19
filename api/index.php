@@ -1,7 +1,7 @@
 <?php
 
-// Siapkan struktur folder cache & storage di direktori /tmp (writable)
-$storageDirs = [
+// Buat direktori cache & storage sementara di folder /tmp
+$dirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/cache/data',
     '/tmp/storage/framework/sessions',
@@ -9,13 +9,12 @@ $storageDirs = [
     '/tmp/bootstrap/cache',
 ];
 
-foreach ($storageDirs as $dir) {
+foreach ($dirs as $dir) {
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
 }
 
-// Arahkan storage Laravel ke /tmp
 putenv('APP_STORAGE=/tmp/storage');
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 

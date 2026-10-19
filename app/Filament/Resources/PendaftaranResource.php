@@ -16,6 +16,10 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\HtmlString;
+use App\Exports\PendaftaranExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 
 class PendaftaranResource extends Resource
 {
@@ -65,7 +69,7 @@ class PendaftaranResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
-                // Rencana Tanggal Kunjungan (Jadwal Booking Pemohon)
+                // Rencana Tanggal Kunjungan
                 TextColumn::make('tanggal_kunjungan')
                     ->label('Rencana Kunjungan')
                     ->date('d/m/Y')
@@ -73,18 +77,12 @@ class PendaftaranResource extends Resource
                     ->color('info')
                     ->sortable(),
 
-                // Nama Sesuai Paspor
+                // Nama Sesuai Paspor & Nama Tambahan
                 TextColumn::make('nama_paspor')
                     ->label('Nama Pemohon')
                     ->searchable()
-                    ->sortable(),
-
-                // NIK
-                TextColumn::make('nik')
-                    ->label('NIK')
-                    ->searchable()
-                    ->copyable()
-                    ->color('gray'),
+                    ->sortable()
+                    ->description(fn (Pendaftaran $record) => $record->nama_tambahan ? "Tambahan: {$record->nama_tambahan}" : null),
 
                 // Nomor Paspor
                 TextColumn::make('no_paspor')
@@ -92,6 +90,18 @@ class PendaftaranResource extends Resource
                     ->searchable()
                     ->copyable()
                     ->weight('bold'),
+
+                // Tanggal Lahir
+                TextColumn::make('tanggal_lahir')
+                    ->label('Tgl Lahir')
+                    ->date('d/m/Y')
+                    ->sortable(),
+
+                // Alamat Domisili
+                TextColumn::make('alamat')
+                    ->label('Alamat')
+                    ->limit(25)
+                    ->tooltip(fn (Pendaftaran $record) => $record->alamat),
 
                 // Jenis Kelamin
                 TextColumn::make('jenis_kelamin')
@@ -121,6 +131,7 @@ class PendaftaranResource extends Resource
                         default => 'gray',
                     }),
             ])
+
             ->filters([
                 SelectFilter::make('status_pendaftaran')
                     ->label('Filter Status')
@@ -129,7 +140,18 @@ class PendaftaranResource extends Resource
                         'Disetujui' => 'Disetujui',
                         'Ditolak' => 'Ditolak',
                     ]),
-            ])
+                ])
+
+            ->headerActions([
+                Action::make('export_all')
+                    ->label('Ekspor Semua ke Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->action(function () {
+                        return Excel::download(new PendaftaranExport(), 'Laporan_Pendaftaran_Vaksin_' . now()->format('Ymd_His') . '.xlsx');
+                    }),
+                ])
+
             ->actions([
                 // SELURUH TINDAKAN DIBUNGKUS DALAM SATU TOMBOL DROPDOWN "AKSI"
                 ActionGroup::make([
@@ -146,11 +168,12 @@ class PendaftaranResource extends Resource
                             'suhu_tubuh'       => $record->suhu_tubuh,
                             'denyut_nadi'      => $record->denyut_nadi,
                             'spo2'             => $record->spo2,
+                            'stok_vaksin'      => $record->stok_vaksin,
                             'nama_petugas'     => $record->nama_petugas ?? auth()->user()->name,
                             'tgl_petugas'      => $record->tgl_petugas ?? now()->toDateString(),
                             'nama_dokter'      => $record->nama_dokter,
                             'tgl_dokter'       => $record->tgl_dokter ?? now()->toDateString(),
-                            'status_kelayakan' => $record->status_kelayakan ?? 'Layak Vaksin',
+                            'status_kelayakan' => $record->status_kelayakan,
                             'catatan_dokter'   => $record->catatan_dokter,
                         ])
                         ->form([
@@ -180,6 +203,12 @@ class PendaftaranResource extends Resource
 
                             Forms\Components\Section::make('Verifikasi Petugas & Dokter')
                                 ->schema([
+                                    Forms\Components\TextInput::make('stok_vaksin')
+                                        ->label('Pengambilan Stok Vaksin')
+                                        ->placeholder('Contoh: 100')
+                                        ->helperText('Dicatat manual jika jaringan Sinkarkes bermasalah untuk urutan buku/kartu fisik.')
+                                        ->columnSpanFull(),
+
                                     Forms\Components\TextInput::make('nama_petugas')
                                         ->label('Diisi Oleh (Petugas)')
                                         ->placeholder('Nama lengkap petugas skrining'),
@@ -201,13 +230,14 @@ class PendaftaranResource extends Resource
                                 ->schema([
                                     Forms\Components\Select::make('status_kelayakan')
                                         ->label('Kesimpulan / Rekomendasi Medis')
+                                        ->placeholder('-- Pilih Kesimpulan Medis --')
                                         ->options([
                                             'Layak Vaksin' => 'Layak Diberikan Vaksinasi',
                                             'Ditunda'      => 'Ditunda (Kondisi Medis Memerlukan Observasi)',
                                             'Tidak Layak'  => 'Tidak Layak Vaksin (Kontraindikasi Berat)',
                                         ])
                                         ->native(false)
-                                        ->required(),
+                                        ->nullable(),
 
                                     Forms\Components\Textarea::make('catatan_dokter')
                                         ->label('Catatan Dokter / Keterangan Khusus')
@@ -335,9 +365,15 @@ class PendaftaranResource extends Resource
                                 ->send();
                         }),
 
-                    // 6. HAPUS DATA & BERKAS
+                    // 6. HAPUS DATA & BERKAS FISIK
                     DeleteAction::make()
-                        ->label('Hapus Pendaftaran'),
+                        ->label('Hapus Pendaftaran')
+                        ->modalHeading('Hapus Data Pendaftaran')
+                        ->modalDescription('Apakah Anda yakin ingin menghapus data permohonan ini? Semua berkas lampiran terkait di storage/app/lampiran_berkas/ akan dihapus permanen.')
+                        ->modalSubmitActionLabel('Ya, Hapus Data & Berkas')
+                        ->modalCancelActionLabel('Batal')
+                        ->successNotificationTitle('Data pendaftaran dan berkas fisik berhasil dihapus')
+                        ->before(fn (Pendaftaran $record) => $record->hapusBerkasFisik()),
                 ])
                 ->label('Aksi')
                 ->icon('heroicon-m-ellipsis-vertical')
@@ -345,11 +381,29 @@ class PendaftaranResource extends Resource
                 ->color('gray')
                 ->button(),
             ])
+            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('export_selected')
+                        ->label('Ekspor Baris Terpilih (.xlsx)')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            return Excel::download(new PendaftaranExport($records), 'Pendaftaran_Vaksin_Terpilih_' . now()->format('Ymd_His') . '.xlsx');
+                        }),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus Data Pendaftaran Terpilih')
+                        ->modalDescription('Apakah Anda yakin ingin menghapus seluruh data pendaftaran yang dipilih? Semua berkas fisik terkait di storage/app/lampiran_berkas/ akan dihapus permanen.')
+                        ->modalSubmitActionLabel('Ya, Hapus Semua')
+                        ->modalCancelActionLabel('Batal')
+                        ->before(fn (Collection $records) => $records->each->hapusBerkasFisik()),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['vaksins']);
     }
 
     public static function getRelations(): array

@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL; // <-- Pastikan ini di-import
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,9 +14,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Paksa semua asset() dan route() memakai https jika bukan di localhost murni
-        if (request()->server->has('HTTP_X_FORWARDED_PROTO') || str_contains(request()->url(), 'trycloudflare.com')) {
-            URL::forceScheme('https');
+        if (! $this->app->runningInConsole()) {
+            if (
+                request()->header('X-Forwarded-Proto') === 'https' ||
+                str_contains(request()->header('cf-visitor', ''), 'https') ||
+                str_contains(request()->getHost(), 'trycloudflare.com')
+            ) {
+                URL::forceScheme('https');
+            }
         }
     }
 }

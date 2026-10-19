@@ -11,11 +11,11 @@
     <!-- ================= HALAMAN 1: FORMULIR PENDAFTARAN ================= -->
     <div class="kop-surat">
         <h4>Kementerian Kesehatan Republik Indonesia</h4>
-        <h3>BALAI KEKARANTINAAN KESEHATAN KELAS II SORONG</h3>
+        <h3>BALAI KEKARANTINAAN KESEHATAN KELAS I SORONG</h3>
         <p>Jl. Jend. Sudirman No. 1, Klademak, Sorong - Papua Barat Daya | Telp: (0951) 321855</p>
     </div>
 
-    <div class="judul-dokumen">FORMULIR PENDAFTARAN VAKSINASI INTERNASIONAL</div>
+    <div class="judul-dokumen">FORMULIR PENDAFTARAN VAKSINASI</div>
 
     <table class="data-table">
         <tr>
@@ -29,7 +29,12 @@
             <td>{{ $pendaftaran->created_at->translatedFormat('d F Y - H:i') }} WIT</td>
         </tr>
         <tr>
-            <td class="fw-bold">Status Verifikasi</td>
+            <td class="fw-bold">Rencana Kunjungan</td>
+            <td>:</td>
+            <td>{{ \Carbon\Carbon::parse($pendaftaran->tanggal_kunjungan)->translatedFormat('d F Y') }}</td>
+        </tr>
+        <tr>
+            <td class="fw-bold">Status Berkas</td>
             <td>:</td>
             <td><span class="badge">{{ $pendaftaran->status_pendaftaran }}</span></td>
         </tr>
@@ -48,19 +53,19 @@
             <td>{{ $pendaftaran->nama_tambahan ?? '-' }}</td>
         </tr>
         <tr>
-            <td>NIK (KTP)</td>
-            <td>:</td>
-            <td>{{ $pendaftaran->nik }}</td>
-        </tr>
-        <tr>
             <td>Nomor Paspor</td>
             <td>:</td>
-            <td class="fw-bold">{{ $pendaftaran->no_paspor }}</td>
+            <td class="fw-bold">{{ $pendaftaran->no_paspor ?? '-' }}</td>
         </tr>
         <tr>
-            <td>Tempat, Tanggal Lahir</td>
+            <td>Alamat Domisili</td>
             <td>:</td>
-            <td>{{ $pendaftaran->tempat_lahir }}, {{ \Carbon\Carbon::parse($pendaftaran->tanggal_lahir)->translatedFormat('d F Y') }}</td>
+            <td>{{ $pendaftaran->alamat ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Tanggal Lahir</td>
+            <td>:</td>
+            <td>{{ \Carbon\Carbon::parse($pendaftaran->tanggal_lahir)->translatedFormat('d F Y') }}</td>
         </tr>
         <tr>
             <td>Jenis Kelamin</td>
@@ -95,20 +100,98 @@
         </tr>
     </table>
 
-    <table style="width: 100%; margin-top: 40px;">
+    <div class="page-break"></div>
+
+    <!-- ================= HALAMAN 2: SURAT PERNYATAAN / INFORMED CONSENT TERSENDIRI ================= -->
+    <div class="kop-surat">
+        <h4>Kementerian Kesehatan Republik Indonesia</h4>
+        <h3>BALAI KEKARANTINAAN KESEHATAN KELAS I SORONG</h3>
+        <p>Jl. Jend. Sudirman No. 1, Klademak, Sorong - Papua Barat Daya | Telp: (0951) 321855</p>
+    </div>
+
+    <div class="judul-dokumen">SURAT PERNYATAAN PERSETUJUAN VAKSINASI<br><span style="font-size: 10pt; font-weight: normal;"></span></div>
+
+    <table style="width: 100%; margin-bottom: 15px; font-size: 10pt;">
         <tr>
-            <td style="width: 55%;"></td>
-            <td style="width: 45%; text-align: center;">
-                Sorong, {{ now()->translatedFormat('d F Y') }}<br>
-                Petugas Verifikator Loket,<br><br><br><br>
-                ( .................................................... )
-            </td>
+            <td style="width: 25%;">No. Registrasi</td>
+            <td style="width: 3%;">:</td>
+            <td style="width: 72%; font-weight: bold;">{{ $pendaftaran->nomor_registrasi }}</td>
+        </tr>
+        <tr>
+            <td>Nama Pemohon</td>
+            <td>:</td>
+            <td style="font-weight: bold;">{{ $pendaftaran->nama_paspor }}</td>
+        </tr>
+        <tr>
+            <td>Nomor Paspor</td>
+            <td>:</td>
+            <td>{{ $pendaftaran->no_paspor ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Tanggal Lahir</td>
+            <td>:</td>
+            <td>{{ \Carbon\Carbon::parse($pendaftaran->tanggal_lahir)->translatedFormat('d F Y') }}</td>
+        </tr>
+        <tr>
+            <td>Alamat Domisili</td>
+            <td>:</td>
+            <td>{{ $pendaftaran->alamat ?? '-' }}</td>
         </tr>
     </table>
 
+    <div style="font-size: 10pt; line-height: 1.8; text-align: justify; margin-top: 15px;">
+        <p>
+            Yang bertanda tangan di bawah ini menyatakan dengan sesungguhnya bahwa:
+        </p>
+
+        <ol style="margin-left: 20px; padding-left: 0;">
+            <li style="margin-bottom: 10px;">
+                Saya bersedia mengikuti pelayanan vaksinasi internasional terhadap: <strong>{{ strtoupper($pendaftaran->persetujuan_untuk ?? 'SAYA SENDIRI') }}</strong> setelah menerima penjelasan lengkap dari tenaga kesehatan mengenai manfaat, indikasi, kontraindikasi, serta kemungkinan risiko efek samping vaksin.
+            </li>
+            <li style="margin-bottom: 10px;">
+                Data dan informasi kesehatan serta riwayat yang saya berikan dalam formulir pendaftaran dan penapisan medis adalah data yang sebenar-benarnya sesuai dengan kondisi saat ini.
+            </li>
+            <li style="margin-bottom: 10px;">
+                Saya bersedia mematuhi seluruh alur pemeriksaan fisik dan evaluasi medis yang ditentukan oleh dokter pemeriksa sebelum dilakukannya tindakan vaksinasi.
+            </li>
+            <li style="margin-bottom: 10px;">
+                Saya berkomitmen untuk tidak memberikan imbalan, hadiah, uang, atau gratifikasi dalam bentuk apa pun kepada petugas kesehatan maupun verifikator dalam pelaksanaan pelayanan vaksinasi ini.
+            </li>
+        </ol>
+
+        <p style="margin-top: 15px;">
+            Demikian surat pernyataan persetujuan ini dibuat dengan penuh kesadaran dan tanggung jawab pribadi tanpa ada paksaan dari pihak mana pun untuk digunakan sebagaimana mestinya.
+        </p>
+    </div>
+
+    <!-- PENGESAHAN ELEKTRONIK SISTEM (TANPA TTD BASAH) -->
+    <div style="margin-top: 40px; border: 1.5px solid #0f172a; background-color: #f8fafc; padding: 15px; border-radius: 4px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+            <tr>
+                <td style="width: 60%; vertical-align: middle;">
+                    <div style="font-weight: bold; font-size: 10pt; color: #166534; margin-bottom: 4px;">
+                        DISETUJUI SECARA ELEKTRONIK OLEH PEMOHON
+                    </div>
+                    <div style="color: #475569; font-size: 8.5pt;">
+                        Persetujuan sah terekam dalam sistem SI-VAKSIN BKK Sorong.<br>
+                        Waktu Persetujuan: <strong>{{ \Carbon\Carbon::parse($pendaftaran->tgl_persetujuan ?? $pendaftaran->created_at)->translatedFormat('d F Y, H:i') }} WIT</strong>
+                    </div>
+                </td>
+                <td style="width: 40%; text-align: center; vertical-align: middle; border-left: 1px dashed #cbd5e1; padding-left: 10px;">
+                    Sorong, {{ \Carbon\Carbon::parse($pendaftaran->tgl_persetujuan ?? $pendaftaran->created_at)->translatedFormat('d F Y') }}<br>
+                    Pemohon / Yang Menyatakan,<br><br>
+                    <div style="font-size: 8pt; color: #166534; font-weight: bold; border: 1px solid #166534; display: inline-block; padding: 3px 8px; border-radius: 3px;">
+                        TERVALIDASI SISTEM
+                    </div><br><br>
+                    <strong>{{ $pendaftaran->nama_paspor }}</strong>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div class="page-break"></div>
 
-    <!-- ================= HALAMAN 2: PENAPISAN MEDIS & TANDA VITAL ================= -->
+    <!-- ================= HALAMAN 3: PENAPISAN MEDIS, TANDA VITAL & STOK ================= -->
     <div class="kop-surat">
         <h4>Kementerian Kesehatan Republik Indonesia</h4>
         <h3>BALAI KEKARANTINAAN KESEHATAN KELAS I SORONG</h3>
@@ -117,7 +200,7 @@
 
     <div class="judul-dokumen">LEMBAR PENAPISAN KONTRAINDIKASI VAKSINASI</div>
 
-    <table style="width: 100%; margin-bottom: 8px; font-size: 9.5pt;">
+    <table style="width: 100%; margin-bottom: 8px; font-size: 9pt;">
         <tr>
             <td style="width: 18%;">Nama Pemohon</td>
             <td style="width: 2%;">:</td>
@@ -152,28 +235,40 @@
         </tbody>
     </table>
 
-    <!-- HASIL PEMERIKSAAN FISIK & KELAYAKAN MEDIS (MENYATU DI HALAMAN 2 - TANPA TANDA TANGAN) -->
-    <div style="margin-top: 10px; font-size: 9.5pt; font-family: Arial, sans-serif;">
+    <!-- HASIL PEMERIKSAAN FISIK & KELAYAKAN MEDIS -->
+    <div style="margin-top: 10px; font-size: 9pt; font-family: Arial, sans-serif;">
         
         <!-- 1. Tanda-Tanda Vital -->
         <table style="width: 100%; border: 1px solid #444; border-collapse: collapse; margin-bottom: 6px;">
             <tr style="background: #f8fafc;">
-                <td style="padding: 5px 8px; width: 25%; border-right: 1px solid #444;">
+                <td style="padding: 4px 8px; width: 25%; border-right: 1px solid #444;">
                     <strong>TD :</strong> {{ $pendaftaran->tekanan_darah ? $pendaftaran->tekanan_darah . ' mmHg' : '-' }}
                 </td>
-                <td style="padding: 5px 8px; width: 25%; border-right: 1px solid #444;">
+                <td style="padding: 4px 8px; width: 25%; border-right: 1px solid #444;">
                     <strong>S :</strong> {{ $pendaftaran->suhu_tubuh ? $pendaftaran->suhu_tubuh . ' °C' : '-' }}
                 </td>
-                <td style="padding: 5px 8px; width: 25%; border-right: 1px solid #444;">
+                <td style="padding: 4px 8px; width: 25%; border-right: 1px solid #444;">
                     <strong>N :</strong> {{ $pendaftaran->denyut_nadi ? $pendaftaran->denyut_nadi . ' x/mnt' : '-' }}
                 </td>
-                <td style="padding: 5px 8px; width: 25%;">
+                <td style="padding: 4px 8px; width: 25%;">
                     <strong>Spo2 :</strong> {{ $pendaftaran->spo2 ? $pendaftaran->spo2 . ' %' : '-' }}
                 </td>
             </tr>
         </table>
 
-        <!-- 2. Petugas & Dokter Verifikator -->
+        <!-- 2. Pencatatan Stok Vaksin Offline -->
+        <table style="width: 100%; border: 1px solid #444; border-collapse: collapse; margin-bottom: 6px;">
+            <tr style="background: #ffffff;">
+                <td style="padding: 4px 8px; width: 35%; background: #f1f5f9; font-weight: bold; border-right: 1px solid #444;">
+                    Pengambilan Stok Vaksin:
+                </td>
+                <td style="padding: 4px 8px; width: 65%; font-weight: bold; color: #0f172a;">
+                    {{ $pendaftaran->stok_vaksin ? $pendaftaran->stok_vaksin : '(Dicatat via Sinkarkes Online)' }}
+                </td>
+            </tr>
+        </table>
+
+        <!-- 3. Petugas & Dokter Verifikator -->
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
             <tr>
                 <td style="width: 50%; vertical-align: top; padding-right: 10px;">
@@ -208,26 +303,33 @@
             </tr>
         </table>
 
-        <!-- 3. Kesimpulan Medis Kelayakan Vaksin -->
-        <div style="border: 1px solid #444; padding: 6px 10px; background: #ffffff;">
-            <strong>Kesimpulan Medis :</strong> 
-            <span style="font-weight: bold; color: {{ ($pendaftaran->status_kelayakan ?? 'Layak Vaksin') == 'Layak Vaksin' ? '#047857' : '#b91c1c' }};">
-                {{ strtoupper($pendaftaran->status_kelayakan ?? 'LAYAK DIBERIKAN VAKSINASI') }}
-            </span>
-            @if($pendaftaran->catatan_dokter)
-                <span style="color: #475569; margin-left: 8px;">(Catatan: {{ $pendaftaran->catatan_dokter }})</span>
-            @endif
-        </div>
+        <!-- 4. Kesimpulan Medis Kelayakan Vaksin -->
+        <div style="border: 1px solid #444; padding: 5px 8px; background: #ffffff;">
+    <strong>Kesimpulan Medis :</strong> 
+    @if(!empty($pendaftaran->nama_dokter) && !empty($pendaftaran->status_kelayakan))
+        <span style="font-weight: bold; color: {{ $pendaftaran->status_kelayakan == 'Layak Vaksin' ? '#047857' : '#b91c1c' }};">
+            {{ strtoupper($pendaftaran->status_kelayakan == 'Layak Vaksin' ? 'LAYAK DIBERIKAN VAKSINASI' : $pendaftaran->status_kelayakan) }}
+        </span>
+    @else
+        <span style="font-weight: bold; color: #64748b; font-style: italic;">
+            MENUNGGU PEMERIKSAAN DOKTER
+        </span>
+    @endif
+
+    @if($pendaftaran->catatan_dokter)
+        <span style="color: #475569; margin-left: 8px;">(Catatan: {{ $pendaftaran->catatan_dokter }})</span>
+    @endif
+</div>
 
     </div>
 
     <div class="page-break"></div>
 
-    <!-- ================= HALAMAN 3: LAMPIRAN PASPOR ================= -->
+    <!-- ================= HALAMAN 4: LAMPIRAN PASPOR ================= -->
     <div class="kop-surat">
         <h4>Lampiran Dokumen Pendaftaran</h4>
         <h3>SALINAN / FOTO FISIK PASPOR</h3>
-        <p>No. Registrasi: {{ $pendaftaran->nomor_registrasi }} | Pemohon: {{ $pendaftaran->nama_paspor }} ({{ $pendaftaran->no_paspor }})</p>
+        <p>No. Registrasi: {{ $pendaftaran->nomor_registrasi }} | Pemohon: {{ $pendaftaran->nama_paspor }} ({{ $pendaftaran->no_paspor ?? '-' }})</p>
     </div>
 
     <div class="lampiran-box">
@@ -240,11 +342,11 @@
 
     <div class="page-break"></div>
 
-    <!-- ================= HALAMAN 4: LAMPIRAN KTP ================= -->
+    <!-- ================= HALAMAN 5: LAMPIRAN KTP ================= -->
     <div class="kop-surat">
         <h4>Lampiran Dokumen Pendaftaran</h4>
         <h3>SALINAN / FOTO FISIK KTP</h3>
-        <p>No. Registrasi: {{ $pendaftaran->nomor_registrasi }} | NIK: {{ $pendaftaran->nik }}</p>
+        <p>No. Registrasi: {{ $pendaftaran->nomor_registrasi }} | Pemohon: {{ $pendaftaran->nama_paspor }} ({{ $pendaftaran->no_paspor ?? '-' }})</p>
     </div>
 
     <div class="lampiran-box">

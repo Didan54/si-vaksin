@@ -15,18 +15,18 @@
         <form action="{{ route('pendaftaran.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <!-- 1. DATA IDENTITAS PEMOHON -->
+            <!-- 1. Data Pelaku Perjalanan (Pemohon) -->
             <h5 class="section-title">1. Data Pelaku Perjalanan (Pemohon)</h5>
-            
             <div class="row g-3 mb-3">
+                <!-- Baris 1: Nama Paspor & Nama Tambahan -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nama Sesuai Paspor <span class="text-danger">*</span></label>
                     <input type="text" 
-                           name="nama_paspor" 
-                           class="form-control @error('nama_paspor') is-invalid @enderror" 
-                           placeholder="Masukkan nama sesuai paspor" 
-                           required 
-                           value="{{ old('nama_paspor') }}">
+                        name="nama_paspor" 
+                        class="form-control @error('nama_paspor') is-invalid @enderror" 
+                        placeholder="Masukkan nama sesuai paspor" 
+                        required 
+                        value="{{ old('nama_paspor') }}">
                     @error('nama_paspor')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -34,77 +34,59 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nama Tambahan <span class="text-danger">*</span></label>
                     <input type="text" 
-                           name="nama_tambahan" 
-                           class="form-control @error('nama_tambahan') is-invalid @enderror" 
-                           placeholder="Nama ayah/marga/tambahan" 
-                           required 
-                           value="{{ old('nama_tambahan') }}">
-                    <div class="form-text small text-muted">Wajib diisi sesuai nama tambahan di paspor (terutama nama 1 suku kata).</div>
+                        name="nama_tambahan" 
+                        class="form-control @error('nama_tambahan') is-invalid @enderror" 
+                        placeholder="Nama ayah/marga/tambahan" 
+                        required 
+                        value="{{ old('nama_tambahan') }}">
+                    <small class="text-muted d-block mt-1" style="font-size: 11.5px;">Wajib diisi sesuai nama tambahan di paspor (terutama nama 1 suku kata).</small>
                     @error('nama_tambahan')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
 
-            <!-- NIK & NOMOR PASPOR -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Nomor Induk Kependudukan (NIK) <span class="text-danger">*</span></label>
-                    <input type="text" 
-                           name="nik" 
-                           class="form-control @error('nik') is-invalid @enderror" 
-                           placeholder="16 digit NIK sesuai KTP" 
-                           maxlength="16" 
-                           pattern="[0-9]{16}" 
-                           title="Harap masukkan 16 digit angka NIK" 
-                           required 
-                           value="{{ old('nik') }}">
-                    @error('nik')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                <!-- Baris 2: Nomor Paspor & Alamat -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nomor Paspor <span class="text-danger">*</span></label>
                     <input type="text" 
-                           name="no_paspor" 
-                           class="form-control @error('no_paspor') is-invalid @enderror" 
-                           placeholder="Nomor paspor pemohon (contoh: C1234567)" 
-                           maxlength="25" 
-                           required 
-                           value="{{ old('no_paspor') }}">
+                        name="no_paspor" 
+                        class="form-control @error('no_paspor') is-invalid @enderror" 
+                        placeholder="Nomor paspor pemohon (contoh: C1234567)" 
+                        maxlength="25" 
+                        required 
+                        value="{{ old('no_paspor') }}">
                     @error('no_paspor')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Tempat Lahir <span class="text-danger">*</span></label>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
                     <input type="text" 
-                           name="tempat_lahir" 
-                           class="form-control @error('tempat_lahir') is-invalid @enderror" 
-                           placeholder="Kota kelahiran" 
-                           required 
-                           value="{{ old('tempat_lahir') }}">
-                    @error('tempat_lahir')
+                        name="alamat" 
+                        class="form-control @error('alamat') is-invalid @enderror" 
+                        placeholder="Alamat lengkap tempat tinggal pemohon" 
+                        required 
+                        value="{{ old('alamat') }}">
+                    @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="col-md-4">
+
+                <!-- Baris 3: Tanggal Lahir & Jenis Kelamin -->
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" 
-                           name="tanggal_lahir" 
-                           class="form-control @error('tanggal_lahir') is-invalid @enderror" 
-                           required 
-                           value="{{ old('tanggal_lahir') }}">
+                        name="tanggal_lahir" 
+                        class="form-control @error('tanggal_lahir') is-invalid @enderror" 
+                        required 
+                        value="{{ old('tanggal_lahir') }}">
                     @error('tanggal_lahir')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
-                    <select name="jenis_kelamin" id="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror" required onchange="filterGender()">
+                    <select name="jenis_kelamin" id="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror" onchange="filterGender()" required>
                         <option value="">-- Pilih --</option>
                         <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                         <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
@@ -115,110 +97,94 @@
                 </div>
             </div>
 
-            <!-- 2. UNGGAH BERKAS PERSYARATAN -->
-            <h5 class="section-title">2. Unggah 4 Berkas Persyaratan</h5>
-            <p class="text-muted small mb-3">Format berkas: <strong>PDF, JPG, JPEG, PNG</strong> (Maksimal 1 MB per dokumen).</p>
-            
-            <div class="row g-3 mb-4">
-                <!-- 1. Tanda Terima SINKARKES -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Tanda Terima Pendaftaran SINKARKES <span class="text-danger">*</span></label>
-                    <div class="position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
-                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
-                            </span>
-                            <input type="text" class="form-control bg-white @error('file_sinkarkes_terima') is-invalid @enderror" id="preview_sinkarkes_terima" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
-                        </div>
-                        <input type="file" 
-                               name="file_sinkarkes_terima" 
-                               id="file_sinkarkes_terima" 
-                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
-                               style="cursor: pointer; z-index: 5;"
-                               accept="application/pdf" 
-                               required 
-                               onchange="updateNamaBerkas(this, 'preview_sinkarkes_terima')">
+            <!-- 2. UNGGAH DOKUMEN PERSYARATAN -->
+            <div class="mb-4">
+                <h5 class="section-title font-utama">2. Unggah Berkas Persyaratan</h5>
+                
+                <div class="alert alert-info py-2 px-3 mb-3 small border-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+                    <div>
+                        <strong>Ketentuan Format:</strong> Berkas SINKARKES wajib format <strong>PDF</strong>. Paspor & KTP wajib format gambar/foto (<strong>JPG, JPEG, PNG</strong>). Ukuran maksimal <strong>1 MB</strong> per berkas.
                     </div>
-                    @error('file_sinkarkes_terima')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
                 </div>
 
-                <!-- 2. Formulir SINKARKES -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Formulir Pendaftaran SINKARKES <span class="text-danger">*</span></label>
-                    <div class="position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
-                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
-                            </span>
-                            <input type="text" class="form-control bg-white @error('file_sinkarkes_form') is-invalid @enderror" id="preview_sinkarkes_form" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
-                        </div>
+                <div class="row g-3">
+                    <!-- 1. Tanda Terima SINKARKES (Hanya PDF) -->
+                    <div class="col-md-6">
+                        <label for="file_sinkarkes_terima" class="form-label fw-semibold">
+                            Tanda Terima Pendaftaran SINKARKES <span class="text-danger">*</span>
+                        </label>
                         <input type="file" 
-                               name="file_sinkarkes_form" 
-                               id="file_sinkarkes_form" 
-                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
-                               style="cursor: pointer; z-index: 5;"
-                               accept="application/pdf" 
-                               required 
-                               onchange="updateNamaBerkas(this, 'preview_sinkarkes_form')">
+                            class="form-control @error('file_sinkarkes_terima') is-invalid @enderror" 
+                            id="file_sinkarkes_terima" 
+                            name="file_sinkarkes_terima" 
+                            accept="application/pdf" 
+                            onchange="validasiBerkas(this)"
+                            required>
+                        <div class="form-text small text-muted">Wajib format: PDF (Maks. 1 MB)</div>
+                        @error('file_sinkarkes_terima')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    @error('file_sinkarkes_form')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
 
-                <!-- 3. Paspor Pemohon -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Paspor Pemohon <span class="text-danger">*</span></label>
-                    <div class="position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
-                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
-                            </span>
-                            <input type="text" class="form-control bg-white @error('file_paspor') is-invalid @enderror" id="preview_paspor" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
-                        </div>
+                    <!-- 2. Formulir Pendaftaran SINKARKES (Hanya PDF) -->
+                    <div class="col-md-6">
+                        <label for="file_sinkarkes_form" class="form-label fw-semibold">
+                            Formulir Pendaftaran SINKARKES <span class="text-danger">*</span>
+                        </label>
                         <input type="file" 
-                               name="file_paspor" 
-                               id="file_paspor" 
-                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
-                               style="cursor: pointer; z-index: 5;"
-                               accept=".pdf,.jpg,.jpeg,.png" 
-                               required 
-                               onchange="updateNamaBerkas(this, 'preview_paspor')">
+                            class="form-control @error('file_sinkarkes_form') is-invalid @enderror" 
+                            id="file_sinkarkes_form" 
+                            name="file_sinkarkes_form" 
+                            accept="application/pdf" 
+                            onchange="validasiBerkas(this)"
+                            required>
+                        <div class="form-text small text-muted">Wajib format: PDF (Maks. 1 MB)</div>
+                        @error('file_sinkarkes_form')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    @error('file_paspor')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
 
-                <!-- 4. KTP Pemohon -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">KTP Pemohon <span class="text-danger">*</span></label>
-                    <div class="position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light text-dark fw-semibold" style="cursor: pointer;">
-                                <i class="bi bi-folder2-open me-1"></i> Pilih Berkas
-                            </span>
-                            <input type="text" class="form-control bg-white @error('file_ktp') is-invalid @enderror" id="preview_ktp" placeholder="Belum ada berkas dipilih" readonly style="cursor: pointer;">
-                        </div>
+                    <!-- 3. Paspor Pemohon (Hanya Gambar) -->
+                    <div class="col-md-6">
+                        <label for="file_paspor" class="form-label fw-semibold">
+                            Foto Paspor Pemohon <span class="text-danger">*</span>
+                        </label>
                         <input type="file" 
-                               name="file_ktp" 
-                               id="file_ktp" 
-                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
-                               style="cursor: pointer; z-index: 5;"
-                               accept=".pdf,.jpg,.jpeg,.png" 
-                               required 
-                               onchange="updateNamaBerkas(this, 'preview_ktp')">
+                            class="form-control @error('file_paspor') is-invalid @enderror" 
+                            id="file_paspor" 
+                            name="file_paspor" 
+                            accept="image/jpeg,image/png,image/jpg" 
+                            onchange="validasiBerkas(this)"
+                            required>
+                        <div class="form-text small text-muted">Wajib format foto: JPG / JPEG / PNG (Maks. 1 MB)</div>
+                        @error('file_paspor')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    @error('file_ktp')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
+
+                    <!-- 4. KTP Pemohon (Hanya Gambar) -->
+                    <div class="col-md-6">
+                        <label for="file_ktp" class="form-label fw-semibold">
+                            Foto KTP Pemohon <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" 
+                            class="form-control @error('file_ktp') is-invalid @enderror" 
+                            id="file_ktp" 
+                            name="file_ktp" 
+                            accept="image/jpeg,image/png,image/jpg" 
+                            onchange="validasiBerkas(this)"
+                            required>
+                        <div class="form-text small text-muted">Wajib format foto: JPG / JPEG / PNG (Maks. 1 MB)</div>
+                        @error('file_ktp')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
             <!-- 3. RIWAYAT KARTU VAKSINASI -->
-            <h5 class="section-title">3. Riwayat Kartu Vaksinasi Internasional</h5>
+            <h5 class="section-title">3. Riwayat Kartu Vaksinasi</h5>
             <div class="box-info-vaksin mb-4">
                 <label class="form-label fw-semibold d-block mb-2">Pilih kartu/sertifikat vaksinasi yang Anda miliki saat ini (centang bila ada):</label>
                 <div class="d-flex flex-wrap gap-4">
@@ -403,6 +369,61 @@
                 </table>
             </div>
 
+            <!-- SURAT PERNYATAAN PERSETUJUAN VAKSINASI (INFORMED CONSENT) -->
+            <div class="card border-0 mb-4 shadow-sm" style="background-color: #f1f5f9; border-radius: 12px;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-dark mb-3">
+                        <i class="bi bi-shield-check text-primary me-2"></i>
+                        SURAT PERNYATAAN PERSETUJUAN VAKSINASI
+                    </h6>
+                    
+                    <p class="text-secondary small mb-3" style="line-height: 1.6; text-align: justify;">
+                        Saya menyatakan bahwa saya bersedia mengikuti vaksinasi internasional setelah mendapatkan penjelasan dari petugas kesehatan mengenai manfaat, risiko, dan kemungkinan efek samping vaksin. Saya telah memberikan informasi yang benar mengenai kondisi kesehatan dan riwayat saya serta bersedia menjalani pemeriksaan kesehatan sebelum vaksinasi.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark small">Persetujuan ini diberikan terhadap: <span class="text-danger">*</span></label>
+                        <select name="persetujuan_untuk" class="form-select @error('persetujuan_untuk') is-invalid @enderror" required>
+                            <option value="Saya sendiri" {{ old('persetujuan_untuk') == 'Saya sendiri' ? 'selected' : '' }}>Saya sendiri</option>
+                            <option value="Anak saya" {{ old('persetujuan_untuk') == 'Anak saya' ? 'selected' : '' }}>Anak saya</option>
+                            <option value="Orangtua saya" {{ old('persetujuan_untuk') == 'Orangtua saya' ? 'selected' : '' }}>Orangtua saya</option>
+                        </select>
+                        @error('persetujuan_untuk')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <p class="text-secondary small mb-3" style="line-height: 1.6; text-align: justify;">
+                        Dan saya berkomitmen tidak akan memberikan hadiah, barang, uang, atau gratifikasi yang tidak sesuai dengan peraturan perundang-undangan kepada petugas dalam pelayanan vaksinasi.
+                    </p>
+
+                    <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                        Demikian surat pernyataan ini saya buat dengan sadar dan tanpa paksaan dari pihak mana pun untuk dipergunakan sebagaimana mestinya.
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary-subtle">
+                        <div class="form-check">
+                            <input class="form-check-input @error('is_setuju') is-invalid @enderror" 
+                                   type="checkbox" 
+                                   name="is_setuju" 
+                                   value="1" 
+                                   id="checkSetuju" 
+                                   required 
+                                   {{ old('is_setuju') ? 'checked' : '' }}>
+                            <label class="form-check-label fw-semibold text-dark small" for="checkSetuju">
+                                Ya, saya setuju
+                            </label>
+                            @error('is_setuju')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="text-muted small">
+                            Sorong, {{ \Carbon\Carbon::now()->isoFormat('D MMMM Y') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="d-grid pt-2">
                 <button type="submit" class="btn btn-bkk py-2">
                     <i class="bi bi-send me-1"></i> Kirim Formulir Pendaftaran
@@ -443,7 +464,10 @@
                     <i class="bi bi-info-circle-fill me-1"></i> <strong>Catatan:</strong> Verifikasi berkas fisik (Paspor asli & KTP) serta penapisan dokter dilakukan langsung saat Anda tiba di kantor Balai Kekarantinaan Kesehatan Sorong.
                 </div>
 
-                <button type="button" class="btn btn-bkk w-100 py-2 fw-semibold" data-bs-dismiss="modal">
+                <button type="button" 
+                    class="btn btn-bkk w-100 py-2 fw-semibold" 
+                    data-bs-dismiss="modal"
+                    onclick="window.location.href='{{ route('pendaftaran.create') }}'">
                     Tutup & Mengerti
                 </button>
             </div>
@@ -451,45 +475,23 @@
     </div>
 </div>
 
-<script>
-(function() {
-    function bukaModalSukses() {
-        const modalEl = document.getElementById('modalSuksesDaftar');
-        if (!modalEl) return;
-
-        if (window.bootstrap && window.bootstrap.Modal) {
-            const modalObj = new bootstrap.Modal(modalEl);
-            modalObj.show();
-        } else if (window.jQuery && typeof jQuery.fn.modal !== 'undefined') {
-            $('#modalSuksesDaftar').modal('show');
-        } else {
-            // Coba lagi setelah 150ms jika berkas bundle bootstrap belum selesai terunduh
-            setTimeout(bukaModalSukses, 150);
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bukaModalSukses);
-    } else {
-        bukaModalSukses();
-    }
-})();
-</script>
 @endif
 @endsection
 
+@push('styles')
 <!-- Hubungkan ke CSS Kalender Terpisah -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="{{ asset('css/kalender-vaksin.css') }}">
+@endpush
 
+@push('scripts')
 <!-- Library JS Flatpickr -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
 <script>
-// Fungsi untuk validasi ukuran (maks 1MB), format PDF Sinkarkes, dan menampilkan nama file
-function updateNamaBerkas(input, targetId) {
-    const preview = document.getElementById(targetId);
+// Fungsi untuk validasi berkas (maks 1MB dan format file)
+function validasiBerkas(input) {
     const maxUkuran = 1 * 1024 * 1024; // 1 MB (dalam bytes)
 
     if (input.files && input.files[0]) {
@@ -499,30 +501,30 @@ function updateNamaBerkas(input, targetId) {
         if (file.size > maxUkuran) {
             const ukuranAsliMB = (file.size / (1024 * 1024)).toFixed(2);
             alert(`Ukuran berkas terlalu besar (${ukuranAsliMB} MB)!\nMaksimal ukuran berkas yang diperbolehkan adalah 1 MB. Silakan pilih atau kompres berkas terlebih dahulu.`);
-            input.value = ''; // Kosongkan file input
-            if (preview) preview.value = '';
+            input.value = '';
             return;
         }
 
-        // 2. Validasi Khusus Berkas SINKARKES (Hanya Boleh PDF)
+        // 2. Validasi Format Berkas
         const idInput = input.id || input.name;
+        const ekstensi = file.name.split('.').pop().toLowerCase();
+
         if (idInput.includes('sinkarkes')) {
-            const ekstensi = file.name.split('.').pop().toLowerCase();
             if (file.type !== 'application/pdf' && ekstensi !== 'pdf') {
                 alert('Peringatan: Berkas SINKARKES wajib berupa dokumen PDF!');
-                input.value = ''; // Kosongkan file input
-                if (preview) preview.value = '';
+                input.value = '';
+                return;
+            }
+        } else if (idInput.includes('paspor') || idInput.includes('ktp')) {
+            const formatFoto = ['jpg', 'jpeg', 'png'];
+            if (!formatFoto.includes(ekstensi)) {
+                alert('Peringatan: Foto Paspor/KTP wajib berformat JPG, JPEG, atau PNG!');
+                input.value = '';
                 return;
             }
         }
 
-        // Jika lolos validasi, tampilkan nama file di kolom preview
-        if (preview) {
-            preview.value = file.name;
-            preview.classList.remove('is-invalid');
-        }
-    } else {
-        if (preview) preview.value = '';
+        input.classList.remove('is-invalid');
     }
 }
 
@@ -560,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
         altInput: true,
         altFormat: "l, d F Y",
         minDate: "today",
-        monthSelectorType: "static", // Mengubah dropdown bulan menjadi teks biasa
+        monthSelectorType: "static",
         disable: [
             // Kunci Sabtu (6) dan Minggu (0)
             function(date) {
@@ -605,6 +607,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modalElement && typeof bootstrap !== 'undefined') {
             const modalSukses = new bootstrap.Modal(modalElement);
             modalSukses.show();
+
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                window.location.href = "{{ route('pendaftaran.create') }}";
+            });
         }
     @endif
 
@@ -617,3 +627,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+@endpush

@@ -16,6 +16,9 @@
 
     <!-- File CSS Eksternal -->
     <link rel="stylesheet" href="{{ asset('css/style-vaksin.css') }}?v={{ time() }}">
+
+    <!-- Stack untuk stylesheet tambahan dari halaman -->
+    @stack('styles')
 </head>
 <body>
 

@@ -23,37 +23,42 @@ h1, h2, h3, h4, h5, h6, .font-utama {
     letter-spacing: 0.3px;
 }
 
-/* --- TOP HEADER (DIBERIKAN JARAK LEBIH LEGA & RAPI) --- */
+/* --- TOP HEADER (RESPONSIF & TIDAK MEMAKAN RUANG) --- */
 .top-header {
     background-color: #ffffff;
     border-bottom: 2px solid var(--bkk-border);
-    padding: 18px 0; /* Jarak atas-bawah lebih lega */
+    padding: 8px 0; /* Padding dibuat ringkas agar tidak memakan ruang layar */
 }
 
 .header-title-main {
     color: var(--bkk-navy);
-    font-size: 1.25rem;
-    line-height: 1.35;
-    margin-bottom: 6px; /* Jarak antara judul instansi dan kementerian */
-    letter-spacing: 0.5px;
+    font-size: clamp(0.72rem, 3.1vw, 1.15rem);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 2px;
 }
 
 .header-subtitle {
     color: var(--bkk-toska-dark);
-    font-size: 0.92rem;
+    font-size: clamp(0.58rem, 2.2vw, 0.85rem);
     font-weight: 600;
-    letter-spacing: 0.3px;
+    line-height: 1.2;
 }
 
 .logo-slot img {
-    height: 50px;
+    height: 40px;
     width: auto;
     object-fit: contain;
-    transition: transform 0.2s ease;
 }
 
-.logo-slot img:hover {
-    transform: scale(1.05);
+/* Khusus di layar smartphone */
+@media (max-width: 576px) {
+    .top-header {
+        padding: 6px 0;
+    }
+    .logo-slot img {
+        height: 25px; /* Logo mengecil otomatis agar muat satu baris di samping teks */
+    }
 }
 
 /* --- NAVBAR --- */

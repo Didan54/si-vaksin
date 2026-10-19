@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Filament\Resources\PendaftaranResource;
 use App\Models\Pendaftaran;
 use App\Models\Vaksin;
 use App\Models\HariLibur;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Filament\Notifications\Notification;
-use App\Models\User;
+use Filament\Notifications\Actions\Action as NotificationAction;
 
 class PendaftaranController extends Controller
 {
@@ -17,14 +20,13 @@ class PendaftaranController extends Controller
     {
         $daftarVaksin = Vaksin::all();
 
-        $daftarLibur = \App\Models\HariLibur::pluck('tanggal')->toArray();
+        $daftarLibur = HariLibur::pluck('tanggal')->toArray();
         return view('pendaftaran.create', compact('daftarVaksin', 'daftarLibur'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // ... (validasi tetap sama)
             'vaksin_id'   => 'required|array|min:1',
             'vaksin_id.*' => [
                 'required',
@@ -32,27 +34,27 @@ class PendaftaranController extends Controller
                     $query->where('is_aktif', true);
                 }),
             ],
-            'nama_paspor'         => 'required|string|max:150',
-            'nama_tambahan'       => 'required|string|max:150',
-            'nik'                 => 'required|numeric|digits:16',
-            'no_paspor'           => 'required|string|max:25',
-            'tempat_lahir'        => 'required|string|max:100',
-            'tanggal_lahir'       => 'required|date',
-            'jenis_kelamin'       => 'required|in:L,P',
-            'tanggal_kunjungan'   => 'required|date',
-            'file_sinkarkes_terima' => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024',
-            'file_sinkarkes_form'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024',
-            'file_paspor'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024',
-            'file_ktp'              => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024',
+            'nama_paspor'           => 'required|string|max:150',
+            'nama_tambahan'         => 'required|string|max:150',
+            'no_paspor'             => 'required|string|max:25',
+            'alamat'                => 'required|string',
+            'tanggal_lahir'         => 'required|date',
+            'jenis_kelamin'         => 'required|in:L,P',
+            'tanggal_kunjungan'     => 'required|date',
+            'file_sinkarkes_terima' => 'required|file|mimes:pdf|max:1024',
+            'file_sinkarkes_form'   => 'required|file|mimes:pdf|max:1024',
+            'file_paspor'           => 'required|file|mimes:jpeg,jpg,png|max:1024',
+            'file_ktp'              => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
             'kartu_vaksin'          => 'nullable|array',
             'skrining'              => 'required|array',
+            'persetujuan_untuk'     => 'required|in:Saya sendiri,Anak saya,Orangtua saya',
+            'is_setuju'             => 'accepted',
         ], [
-            'vaksin_id.required' => 'Silakan pilih minimal satu jenis vaksinasi yang ingin diajukan.',
-            'vaksin_id.*.exists' => 'Salah satu jenis vaksin yang dipilih sedang ditutup sementara.',
-            'nik.required'       => 'Nomor Induk Kependudukan (NIK) wajib diisi.',
-            'nik.digits'         => 'NIK harus berjumlah tepat 16 digit angka.',
-            'nik.numeric'        => 'NIK hanya boleh berupa angka.',
-            'no_paspor.required' => 'Nomor paspor wajib diisi.',
+            'vaksin_id.required'  => 'Silakan pilih minimal satu jenis vaksinasi yang ingin diajukan.',
+            'vaksin_id.*.exists'  => 'Salah satu jenis vaksin yang dipilih sedang ditutup sementara.',
+            'no_paspor.required'  => 'Nomor paspor wajib diisi.',
+            'alamat.required'     => 'Alamat tempat tinggal wajib diisi.',
+            'is_setuju.accepted'  => 'Anda wajib menyetujui surat pernyataan untuk melanjutkan pendaftaran.',
         ]);
 
         // Upload berkas
@@ -60,6 +62,8 @@ class PendaftaranController extends Controller
         foreach (['file_sinkarkes_terima', 'file_sinkarkes_form', 'file_paspor', 'file_ktp'] as $fileKey) {
             if ($request->hasFile($fileKey)) {
                 $berkas[$fileKey] = $request->file($fileKey)->store('lampiran_berkas');
+            } else {
+                $berkas[$fileKey] = null;
             }
         }
 
@@ -69,10 +73,9 @@ class PendaftaranController extends Controller
         $pendaftaran = Pendaftaran::create([
             'nomor_registrasi'      => $noRegistrasi,
             'nama_paspor'           => $validated['nama_paspor'],
-            'nama_tambahan'         => $validated['nama_tambahan'],
-            'nik'                   => $validated['nik'],          
-            'no_paspor'             => $validated['no_paspor'],    
-            'tempat_lahir'          => $validated['tempat_lahir'],
+            'nama_tambahan'         => $validated['nama_tambahan'],    
+            'no_paspor'             => $validated['no_paspor'],
+            'alamat'                => $validated['alamat'],    
             'tanggal_lahir'         => $validated['tanggal_lahir'],
             'jenis_kelamin'         => $validated['jenis_kelamin'],
             'tanggal_kunjungan'     => $validated['tanggal_kunjungan'],
@@ -82,14 +85,17 @@ class PendaftaranController extends Controller
             'file_ktp'              => $berkas['file_ktp'],
             'kartu_vaksin'          => $request->input('kartu_vaksin', []),
             'data_skrining'         => $validated['skrining'],
+            'persetujuan_untuk'     => $validated['persetujuan_untuk'],
+            'is_setuju'             => true,
+            'tgl_persetujuan'       => now(),
             'status_pendaftaran'    => 'Menunggu Verifikasi',
         ]);
 
         // 2. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
         $pendaftaran->vaksins()->attach($validated['vaksin_id']);
 
-        // 3. KIRIM NOTIFIKASI KE SEMUA AKUN ADMIN
-        $admins = User::all(); // Anda bisa memfilter berdasarkan role jika punya sistem role
+        // 3. Kirim notifikasi ke Admin
+        $admins = User::all();
         foreach ($admins as $admin) {
             Notification::make()
                 ->title('Pendaftaran Vaksin Baru Masuk!')
@@ -97,10 +103,11 @@ class PendaftaranController extends Controller
                 ->success()
                 ->icon('heroicon-o-bell-alert')
                 ->actions([
-                    \Filament\Notifications\Actions\Action::make('view')
+                    NotificationAction::make('view')
                         ->button()
                         ->label('Lihat Detail')
-                        ->url(route('filament.admin.resources.pendaftarans.index')) // Sesuaikan dengan nama route resource anda
+                        ->url(PendaftaranResource::getUrl('index', isAbsolute: false))
+                        ->markAsRead(),
                 ])
                 ->sendToDatabase($admin);
         }
@@ -109,5 +116,41 @@ class PendaftaranController extends Controller
             'nomor_registrasi' => $pendaftaran->nomor_registrasi,
             'nama_paspor'      => $pendaftaran->nama_paspor,
         ]);
+    }
+
+    /**
+     * Layani akses dokumen privat pendaftaran untuk admin terotentikasi.
+     */
+    public function dokumenPrivat(string $path)
+    {
+        $cleanPath = ltrim(str_replace('lampiran_berkas/', '', $path), '/');
+        $filePath = 'lampiran_berkas/' . $cleanPath;
+
+        if (Storage::disk('local')->exists($filePath)) {
+            return response()->file(storage_path('app/' . $filePath));
+        }
+
+        if (Storage::disk('local')->exists($path)) {
+            return response()->file(storage_path('app/' . $path));
+        }
+
+        abort(404, 'Dokumen tidak ditemukan atau akses ditolak.');
+    }
+
+    /**
+     * Tandai/hapus notifikasi terkait nomor registrasi dan redirect ke daftar pendaftaran.
+     */
+    public function bacaNotif(string $nomor_registrasi)
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($user) {
+            $user->notifications()
+                ->where('data', 'like', '%' . $nomor_registrasi . '%')
+                ->delete();
+        }
+
+        return redirect('/admin/pendaftarans');
     }
 }

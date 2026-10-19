@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VaksinResource\Pages;
 use App\Models\Vaksin;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -28,10 +27,14 @@ class VaksinResource extends Resource
             ->schema([
                 TextInput::make('nama_vaksin')
                     ->label('Nama Layanan Vaksin')
+                    ->placeholder('Contoh: Meningitis Meningokokus')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+
                 Toggle::make('is_aktif')
                     ->label('Status Tersedia (Aktif)')
+                    ->helperText('Jika nonaktif, pilihan tidak akan muncul di form pendaftaran publik.')
                     ->default(true),
             ]);
     }
@@ -60,7 +63,9 @@ class VaksinResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->modalHeading('Ubah Data Vaksin')
+                    ->modalWidth('md'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -81,8 +86,6 @@ class VaksinResource extends Resource
     {
         return [
             'index' => Pages\ListVaksins::route('/'),
-            'create' => Pages\CreateVaksin::route('/create'),
-            'edit' => Pages\EditVaksin::route('/{record}/edit'),
         ];
     }
 }

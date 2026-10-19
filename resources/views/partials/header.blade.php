@@ -1,12 +1,12 @@
-<!-- TOP HEADER (BRANDING & LOGO) -->
+<!-- 1. TOP HEADER (BRANDING & LOGO) -->
 <header class="top-header">
-    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-        <div class="text-center text-md-start">
-            <h6 class="header-title-main font-utama mb-0">BALAI KEKARANTINAAN KESEHATAN KELAS II SORONG</h6>
-            <div class="header-subtitle">Kementerian Kesehatan Republik Indonesia</div>
+    <div class="container d-flex flex-row align-items-center justify-content-between flex-nowrap gap-2">
+        <div class="text-start text-truncate pe-1" style="min-width: 0;">
+            <h6 class="header-title-main font-utama mb-0 text-truncate">BALAI KEKARANTINAAN KESEHATAN KELAS II SORONG</h6>
+            <div class="header-subtitle text-truncate">Kementerian Kesehatan Republik Indonesia</div>
         </div>
 
-        <div class="logo-slot d-flex align-items-center justify-content-center gap-3 flex-wrap">
+        <div class="logo-slot d-flex align-items-center justify-content-end gap-1 gap-sm-2 flex-nowrap flex-shrink-0">
             <img src="{{ asset('images/bkksorong.gif') }}" alt="Logo Kemenkes BKK" title="BKK Sorong" onerror="this.style.display='none'">
             <img src="{{ asset('images/logo-karkes.png') }}" alt="Logo Lambang Karkes" title="Kekarantinaan Kesehatan" onerror="this.style.display='none'">
             <img src="{{ asset('images/logo-tolak-korupsi.gif') }}" alt="Logo Tolak Korupsi" title="Tolak Korupsi" onerror="this.style.display='none'">
@@ -14,10 +14,10 @@
     </div>
 </header>
 
-<!-- NAVIGASI MENU -->
+<!-- 2. NAVIGASI MENU -->
 <nav class="navbar navbar-expand-lg navbar-bkk py-1">
     <div class="container">
-        <span class="navbar-brand text-white font-utama fs-6 d-lg-none">E-VAKSIN BKK SORONG</span>
+        <span class="navbar-brand text-white font-utama fs-6 d-lg-none">SI-VAKSIN BKK SORONG</span>
         <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
             <i class="bi bi-list fs-2 text-white"></i>
         </button>
@@ -40,7 +40,7 @@
     </div>
 </nav>
 
-<!-- HERO BANNER -->
+<!-- 3. HERO BANNER -->
 <section class="hero-section">
     <div class="container">
         <h2 class="font-utama">Pelayanan Vaksinasi Internasional</h2>
