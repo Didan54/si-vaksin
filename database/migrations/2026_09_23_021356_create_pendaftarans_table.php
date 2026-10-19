@@ -15,10 +15,15 @@ return new class extends Migration
             // Data identitas yang diinput pemohon
             $table->string('nama_paspor');
             $table->string('nama_tambahan')->nullable();
-            $table->string('tempat_lahir');
+            $table->string('alamat');
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['L', 'P']);
-            
+           
+            // Persetujuan Vaksinasi (Informed Consent)
+            $table->string('persetujuan_untuk', 50)->default('Saya sendiri');
+            $table->boolean('is_setuju')->default(true);
+            $table->timestamp('tgl_persetujuan')->nullable();
+
             // 4 Berkas Lampiran
             $table->string('file_sinkarkes_terima');
             $table->string('file_sinkarkes_form');
