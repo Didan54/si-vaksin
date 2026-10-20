@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PendaftaranPdfController;
+use App\Http\Controllers\VerifikasiController;
 
 // 1. Redirect root URL langsung ke halaman formulir pendaftaran
 Route::redirect('/', '/daftar');
@@ -26,3 +27,7 @@ Route::post('/daftar', [PendaftaranController::class, 'store'])
 
 // 5. Rute Cetak Dokumen PDF
 Route::get('/admin/pendaftaran/{id}/pdf', [PendaftaranPdfController::class, 'cetak'])->name('admin.pendaftaran.pdf');
+
+// 6.Verif Persetujuan
+Route::get('/verifikasi/{nomor_registrasi}', [VerifikasiController::class, 'show'])
+    ->name('verifikasi.dokumen');

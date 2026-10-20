@@ -29,6 +29,10 @@ class Pendaftaran extends Model
         'is_setuju',
         'tgl_persetujuan',
         'status_pendaftaran',
+        'signature_hash',
+        'signed_at',
+        'kapasitas_pemohon',
+        'setuju_anti_gratifikasi',
         // Parameter pemeriksaan medis:
         'tekanan_darah',
         'suhu_tubuh',

@@ -7,6 +7,7 @@ use App\Models\Pendaftaran;
 use App\Models\Vaksin;
 use App\Models\HariLibur;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -19,8 +20,8 @@ class PendaftaranController extends Controller
     public function create()
     {
         $daftarVaksin = Vaksin::all();
-
         $daftarLibur = HariLibur::pluck('tanggal')->toArray();
+
         return view('pendaftaran.create', compact('daftarVaksin', 'daftarLibur'));
     }
 
@@ -67,34 +68,44 @@ class PendaftaranController extends Controller
             }
         }
 
-        $noRegistrasi = 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+        // 1. Waktu submit WIT (Jayapura/Sorong) & Nomor Registrasi
+        $waktuPersetujuan = Carbon::now('Asia/Jayapura');
+        $noRegistrasi = 'REG-' . $waktuPersetujuan->format('Ymd') . '-' . strtoupper(Str::random(4));
 
-        // 1. Simpan Data Pendaftaran Utama
+        // 2. Pembuatan Nilai Hash Integritas Dokumen (SHA-256)
+        $payloadHash = $noRegistrasi . '|' . strtoupper($validated['nama_paspor']) . '|' . $waktuPersetujuan->toIso8601String();
+        $signatureHash = hash('sha256', $payloadHash);
+
+        // 3. Simpan Data Pendaftaran Utama
         $pendaftaran = Pendaftaran::create([
-            'nomor_registrasi'      => $noRegistrasi,
-            'nama_paspor'           => $validated['nama_paspor'],
-            'nama_tambahan'         => $validated['nama_tambahan'],    
-            'no_paspor'             => $validated['no_paspor'],
-            'alamat'                => $validated['alamat'],    
-            'tanggal_lahir'         => $validated['tanggal_lahir'],
-            'jenis_kelamin'         => $validated['jenis_kelamin'],
-            'tanggal_kunjungan'     => $validated['tanggal_kunjungan'],
-            'file_sinkarkes_terima' => $berkas['file_sinkarkes_terima'],
-            'file_sinkarkes_form'   => $berkas['file_sinkarkes_form'],
-            'file_paspor'           => $berkas['file_paspor'],
-            'file_ktp'              => $berkas['file_ktp'],
-            'kartu_vaksin'          => $request->input('kartu_vaksin', []),
-            'data_skrining'         => $validated['skrining'],
-            'persetujuan_untuk'     => $validated['persetujuan_untuk'],
-            'is_setuju'             => true,
-            'tgl_persetujuan'       => now(),
-            'status_pendaftaran'    => 'Menunggu Verifikasi',
+            'nomor_registrasi'        => $noRegistrasi,
+            'nama_paspor'             => $validated['nama_paspor'],
+            'nama_tambahan'           => $validated['nama_tambahan'],
+            'no_paspor'               => $validated['no_paspor'],
+            'alamat'                  => $validated['alamat'],
+            'tanggal_lahir'           => $validated['tanggal_lahir'],
+            'jenis_kelamin'           => $validated['jenis_kelamin'],
+            'tanggal_kunjungan'       => $validated['tanggal_kunjungan'],
+            'file_sinkarkes_terima'   => $berkas['file_sinkarkes_terima'],
+            'file_sinkarkes_form'     => $berkas['file_sinkarkes_form'],
+            'file_paspor'             => $berkas['file_paspor'],
+            'file_ktp'                => $berkas['file_ktp'],
+            'kartu_vaksin'            => $request->input('kartu_vaksin', []),
+            'data_skrining'           => $validated['skrining'],
+            'persetujuan_untuk'       => $validated['persetujuan_untuk'],
+            'kapasitas_pemohon'       => $validated['persetujuan_untuk'], // Sinkronisasi dengan kolom baru
+            'is_setuju'               => true,
+            'setuju_anti_gratifikasi' => true,
+            'signature_hash'          => $signatureHash,
+            'signed_at'               => $waktuPersetujuan,
+            'tgl_persetujuan'         => $waktuPersetujuan,
+            'status_pendaftaran'      => 'Menunggu Verifikasi',
         ]);
 
-        // 2. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
+        // 4. Hubungkan jenis-jenis vaksin yang dipilih ke tabel pivot
         $pendaftaran->vaksins()->attach($validated['vaksin_id']);
 
-        // 3. Kirim notifikasi ke Admin
+        // 5. Kirim notifikasi ke Admin Filament
         $admins = User::all();
         foreach ($admins as $admin) {
             Notification::make()

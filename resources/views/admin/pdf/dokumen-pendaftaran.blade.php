@@ -162,28 +162,28 @@
         <p style="margin-top: 15px;">
             Demikian surat pernyataan persetujuan ini dibuat dengan penuh kesadaran dan tanggung jawab pribadi tanpa ada paksaan dari pihak mana pun untuk digunakan sebagaimana mestinya.
         </p>
-    </div>
 
-    <!-- PENGESAHAN ELEKTRONIK SISTEM (TANPA TTD BASAH) -->
-    <div style="margin-top: 40px; border: 1.5px solid #0f172a; background-color: #f8fafc; padding: 15px; border-radius: 4px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
-            <tr>
-                <td style="width: 60%; vertical-align: middle;">
-                    <div style="font-weight: bold; font-size: 10pt; color: #166534; margin-bottom: 4px;">
-                        DISETUJUI SECARA ELEKTRONIK OLEH PEMOHON
+        <table style="width: 100%; border: none !important; border-collapse: collapse; margin-top: 35px; background: transparent;">
+            <tr style="border: none !important;">
+                <!-- Kolom kiri kosong untuk mendorong tanda tangan ke kanan -->
+                <td style="width: 55%; border: none !important; background: transparent;"></td>
+                
+                <!-- Area Tanda Tangan (Sisi Kanan) -->
+                <td style="width: 45%; text-align: center; border: none !important; background: transparent; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.4;">
+                    <p style="margin: 0 0 12px 0;">
+                        Sorong, {{ \Carbon\Carbon::parse($pendaftaran->signed_at ?? $pendaftaran->tgl_persetujuan ?? now())->locale('id')->isoFormat('D MMMM Y') }}<br>
+                        <strong>Pemohon / Yang Menyetujui,</strong>
+                    </p>
+                    
+                    <!-- Gambar QR Code Tanpa Border/Bayangan -->
+                    <div style="margin: 8px auto; width: 100px;">
+                        <img src="data:image/svg+xml;base64,{{ base64_encode(QrCode::size(95)->generate(url('/verifikasi/' . $pendaftaran->nomor_registrasi))) }}" alt="QR Code" style="display: block; width: 100%; height: auto; border: none !important; outline: none !important;">
                     </div>
-                    <div style="color: #475569; font-size: 8.5pt;">
-                        Persetujuan sah terekam dalam sistem SI-VAKSIN BKK Sorong.<br>
-                        Waktu Persetujuan: <strong>{{ \Carbon\Carbon::parse($pendaftaran->tgl_persetujuan ?? $pendaftaran->created_at)->translatedFormat('d F Y, H:i') }} WIT</strong>
-                    </div>
-                </td>
-                <td style="width: 40%; text-align: center; vertical-align: middle; border-left: 1px dashed #cbd5e1; padding-left: 10px;">
-                    Sorong, {{ \Carbon\Carbon::parse($pendaftaran->tgl_persetujuan ?? $pendaftaran->created_at)->translatedFormat('d F Y') }}<br>
-                    Pemohon / Yang Menyatakan,<br><br>
-                    <div style="font-size: 8pt; color: #166534; font-weight: bold; border: 1px solid #166534; display: inline-block; padding: 3px 8px; border-radius: 3px;">
-                        TERVALIDASI SISTEM
-                    </div><br><br>
-                    <strong>{{ $pendaftaran->nama_paspor }}</strong>
+
+                    <!-- Identitas Pemohon -->
+                    <p style="margin: 10px 0 0 0; font-weight: bold; text-decoration: underline;">
+                        {{ $pendaftaran->nama_paspor }}
+                    </p>
                 </td>
             </tr>
         </table>
